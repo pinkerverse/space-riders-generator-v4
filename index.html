@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<title>Space Riders Tiny Generator</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+margin:0;
+font-family:'Orbitron', sans-serif;
+background: radial-gradient(circle at top, #1e293b, #020617);
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+}
+
+.container{
+width:100%;
+max-width:540px;
+background:#0f172a;
+padding:25px;
+border-radius:18px;
+box-shadow:0 0 40px rgba(0,0,0,0.7);
+text-align:center;
+}
+
+h1{
+margin:10px 0;
+font-size:24px;
+}
+
+input{
+padding:12px;
+font-size:14px;
+width:90%;
+border-radius:10px;
+border:none;
+outline:none;
+margin-top:10px;
+}
+
+button{
+padding:10px 16px;
+margin:8px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-size:13px;
+background:linear-gradient(135deg,#6366f1,#22d3ee);
+color:white;
+transition:0.2s;
+}
+
+button:hover{
+transform:scale(1.05);
+box-shadow:0 0 12px #22d3ee;
+}
+
+.donation{
+margin-top:15px;
+padding:12px;
+background:linear-gradient(135deg,#111827,#1f2937);
+border:1px solid rgba(255,255,255,0.1);
+border-radius:12px;
+font-size:12px;
+line-height:1.4;
+box-shadow:0 0 15px rgba(34,211,238,0.2);
+}
+
+canvas{
+margin-top:20px;
+border-radius:12px;
+background:black;
+box-shadow:0 0 30px rgba(0,0,0,0.9);
+width:100%;
+max-width:420px;
+height:auto;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🚀 Space Riders Generator</h1>
+
+<p>Enter NFT ID or OpenSea link</p>
+
+<input id="nftInput" placeholder="4236 or OpenSea link">
+
+<br>
+
+<button onclick="generate()">Generate</button>
+<button onclick="randomRider()">Random</button>
+
+<div class="donation">
+<b>❤️ Enjoying this generator?</b><br>
+Support us:<br><br>
+
+<b>ENS:</b> pinkerverse.eth<br>
+<b>ETH:</b> 0x75f8571F4Ca2f00321cdc2FA469019c0f185E798<br>
+<b>SOL:</b> BVSLNBZirqL1RWy724JeBFoa9wqgjuNwBdQKUxAjG1Tr<br><br>
+
+Thank you for your support 🚀
+</div>
+
+<canvas id="canvas" width="2048" height="2048"></canvas>
+
+<br>
+
+<button onclick="download()">Download</button>
+<button onclick="shareTwitter()">Share</button>
+
+</div>
+
+<script>
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const BASE_URL =
+"https://ipfs.io/ipfs/Qma8e3QrAWVg4buufjUyLjFbjWJ7PKKNzehAct7kxgDFT6/";
+
+const IMG_UPLOAD_KEY = "f9644467bf59d19b4fedb9694e356000";
+
+// ✅ CORRECT LAYER ORDER
+const order = [
+"background",
+"shadow",
+"body",
+"head",
+"eyes",
+"mouth",
+"glasses",
+"hat",
+"space shine"
+];
+
+// Extract NFT ID
+function extractID(input){
+if(input.includes("opensea")){
+let parts = input.split("/");
+return parts[parts.length-1];
+}
+return input;
+}
+
+// ✅ CLEAN NAME WITH CARET FIX
+function cleanName(str){
+
+if(str === "^") return "caret";
+
+return str
+.toLowerCase()
+.replace(/ /g,"_")
+.replace(/[^a-z0-9_]/g,"");
+
+}
+
+// MAIN GENERATOR
+async function generate(){
+
+const raw = document.getElementById("nftInput").value;
+const id = extractID(raw);
+
+const url = BASE_URL + id + ".json";
+
+const response = await fetch(url);
+const data = await response.json();
+
+const traits = data.attributes;
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+for(const layer of order){
+
+// SHADOW (manual layer)
+if(layer === "shadow"){
+await drawLayer("traits/shadow/default.png");
+continue;
+}
+
+const trait = traits.find(t =>
+t.trait_type.toLowerCase() === layer
+);
+
+if(trait){
+
+let folder = cleanName(layer);
+let file = cleanName(trait.value);
+
+let path = "traits/" + folder + "/" + file + ".png";
+
+await drawLayer(path);
+
+}
+
+}
+
+}
+
+// DRAW IMAGE
+function drawLayer(src){
+
+return new Promise(resolve => {
+
+let img = new Image();
+img.src = src;
+
+img.onload = () => {
+ctx.drawImage(img,0,0,2048,2048);
+resolve();
+};
+
+img.onerror = () => resolve();
+
+});
+
+}
+
+// DOWNLOAD
+function download(){
+
+const link = document.createElement("a");
+link.href = canvas.toDataURL("image/png");
+link.download = "space-rider.png";
+
+document.body.appendChild(link);
+link.click();
+document.body.removeChild(link);
+
+}
+
+// RANDOM
+function randomRider(){
+
+const id = Math.floor(Math.random()*8888);
+document.getElementById("nftInput").value = id;
+generate();
+
+}
+
+// CANVAS → BLOB
+function canvasToBlob(){
+return new Promise(resolve => {
+canvas.toBlob(blob => resolve(blob));
+});
+}
+
+// UPLOAD IMAGE
+async function uploadImage(){
+
+const blob = await canvasToBlob();
+
+const formData = new FormData();
+formData.append("image", blob);
+
+const response = await fetch(
+"https://api.imgbb.com/1/upload?key=" + IMG_UPLOAD_KEY,
+{
+method:"POST",
+body:formData
+});
+
+const data = await response.json();
+return data.data.url;
+
+}
+
+// SHARE
+async function shareTwitter(){
+
+const imageURL = await uploadImage();
+
+const message =
+"LOOK! I tried @pinkerverse's tiny @SpaceRidersXYZ generator 🚀\n\nGive it a go at www.pinkerverse.com/tinygenerator\n\n" + imageURL;
+
+const tweet =
+"https://twitter.com/intent/tweet?text=" +
+encodeURIComponent(message);
+
+window.open(tweet,"_blank");
+
+}
+
+</script>
+
+</body>
+</html>
