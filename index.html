@@ -118,7 +118,7 @@ Thank you for your support 🚀
 <br>
 
 <button onclick="download()">Download</button>
-<button onclick="shareTwitter()">Share</button>
+<button onclick="shareTwitter()">Share on X (auto-copy)</button>
 
 </div>
 
@@ -132,7 +132,7 @@ const BASE_URL =
 
 const IMG_UPLOAD_KEY = "f9644467bf59d19b4fedb9694e356000";
 
-// ✅ CORRECT LAYER ORDER
+// Correct layer order
 const order = [
 "background",
 "shadow",
@@ -154,7 +154,7 @@ return parts[parts.length-1];
 return input;
 }
 
-// ✅ CLEAN NAME WITH CARET FIX
+// Clean name (caret fix included)
 function cleanName(str){
 
 if(str === "^") return "caret";
@@ -166,7 +166,7 @@ return str
 
 }
 
-// MAIN GENERATOR
+// Generate image
 async function generate(){
 
 const raw = document.getElementById("nftInput").value;
@@ -183,7 +183,6 @@ ctx.clearRect(0,0,canvas.width,canvas.height);
 
 for(const layer of order){
 
-// SHADOW (manual layer)
 if(layer === "shadow"){
 await drawLayer("traits/shadow/default.png");
 continue;
@@ -208,7 +207,7 @@ await drawLayer(path);
 
 }
 
-// DRAW IMAGE
+// Draw layer
 function drawLayer(src){
 
 return new Promise(resolve => {
@@ -227,7 +226,7 @@ img.onerror = () => resolve();
 
 }
 
-// DOWNLOAD
+// Download
 function download(){
 
 const link = document.createElement("a");
@@ -240,7 +239,7 @@ document.body.removeChild(link);
 
 }
 
-// RANDOM
+// Random NFT
 function randomRider(){
 
 const id = Math.floor(Math.random()*8888);
@@ -249,15 +248,19 @@ generate();
 
 }
 
-// CANVAS → BLOB
+// Convert canvas
 function canvasToBlob(){
 return new Promise(resolve => {
 canvas.toBlob(blob => resolve(blob));
 });
 }
 
-// UPLOAD IMAGE
-async function uploadImage(){
+// Share (improved UX)
+async function shareTwitter(){
+
+try{
+
+alert("Uploading your Space Rider... 🚀");
 
 const blob = await canvasToBlob();
 
@@ -272,23 +275,32 @@ body:formData
 });
 
 const data = await response.json();
-return data.data.url;
 
-}
+const imageURL = data.data.url;
 
-// SHARE
-async function shareTwitter(){
+// Copy to clipboard
+await navigator.clipboard.writeText(imageURL);
 
-const imageURL = await uploadImage();
-
+// Open Twitter
 const message =
-"LOOK! I tried @pinkerverse's tiny @SpaceRidersXYZ generator 🚀\n\nGive it a go at www.pinkerverse.com/tinygenerator\n\n" + imageURL;
+"LOOK! I tried @pinkerverse's tiny @SpaceRidersXYZ generator 🚀\n\nGive it a go at www.pinkerverse.com/tinygenerator\n\n(Paste to attach image 👇)";
 
 const tweet =
 "https://twitter.com/intent/tweet?text=" +
 encodeURIComponent(message);
 
 window.open(tweet,"_blank");
+
+// Instruction
+setTimeout(()=>{
+alert("Image link copied! Paste it into your tweet (Cmd+V / Ctrl+V) 👍");
+},500);
+
+}catch(e){
+
+alert("Something went wrong uploading 😢");
+
+}
 
 }
 
