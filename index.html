@@ -93,7 +93,6 @@ max-width:420px;
 height:auto;
 }
 
-/* MOBILE OPTIMISATION */
 @media (max-width: 600px){
 
 .container{
@@ -170,6 +169,7 @@ const ctx = canvas.getContext("2d");
 const BASE_URL =
 "https://ipfs.io/ipfs/Qma8e3QrAWVg4buufjUyLjFbjWJ7PKKNzehAct7kxgDFT6/";
 
+// ✅ FIXED LAYER ORDER (GLASSES ABOVE HAT)
 const order = [
 "background",
 "shadow",
@@ -177,8 +177,8 @@ const order = [
 "head",
 "eyes",
 "mouth",
-"glasses",
 "hat",
+"glasses",
 "space shine"
 ];
 
