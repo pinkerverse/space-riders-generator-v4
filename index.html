@@ -73,7 +73,6 @@ line-height:1.4;
 box-shadow:0 0 15px rgba(34,211,238,0.2);
 }
 
-/* SHARE INSTRUCTIONS ALWAYS VISIBLE */
 .shareGuide{
 margin-top:15px;
 padding:14px;
@@ -92,6 +91,21 @@ box-shadow:0 0 30px rgba(0,0,0,0.9);
 width:100%;
 max-width:420px;
 height:auto;
+}
+
+/* MOBILE OPTIMISATION */
+@media (max-width: 600px){
+
+.container{
+padding:18px;
+}
+
+button{
+width:100%;
+margin:6px 0;
+font-size:14px;
+}
+
 }
 
 </style>
@@ -129,15 +143,19 @@ Thank you for your support 🚀
 <br>
 
 <button onclick="download()">Download</button>
+<button onclick="saveMobile()">Save Image (Mobile)</button>
 <button onclick="shareTwitter()">Share on X</button>
 
-<!-- ✅ ALWAYS VISIBLE INSTRUCTIONS -->
 <div class="shareGuide">
 <b>How to share your Space Rider:</b><br><br>
 
-1️⃣ Right-click the image above → <b>Copy Image</b><br><br>
-2️⃣ Click <b>Share on X</b><br><br>
-3️⃣ In your tweet → press <b>Cmd+V / Ctrl+V</b> to paste the image<br><br>
+<b>💻 Desktop:</b><br>
+Right-click the image → Copy Image → Paste into tweet<br><br>
+
+<b>📱 Mobile:</b><br>
+1. Tap <b>Save Image</b><br>
+2. Open X (Twitter)<br>
+3. Create post → Upload image<br><br>
 
 🚀 Done!
 </div>
@@ -253,6 +271,18 @@ document.body.removeChild(link);
 
 }
 
+function saveMobile(){
+
+const link = document.createElement("a");
+link.href = canvas.toDataURL("image/png");
+link.download = "space-rider.png";
+
+document.body.appendChild(link);
+link.click();
+document.body.removeChild(link);
+
+}
+
 function randomRider(){
 
 const id = Math.floor(Math.random()*8888);
@@ -261,7 +291,6 @@ generate();
 
 }
 
-/* SIMPLE SHARE */
 function shareTwitter(){
 
 const message =
