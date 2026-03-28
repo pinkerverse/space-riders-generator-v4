@@ -241,27 +241,37 @@ generate();
 
 }
 
+/* ✅ COMPRESSED UPLOAD VERSION */
 function canvasToBlob(){
+
 return new Promise(resolve => {
-canvas.toBlob(blob => resolve(blob));
+
+canvas.toBlob(
+blob => resolve(blob),
+"image/jpeg",
+0.9
+);
+
 });
+
 }
 
+/* ✅ FIXED SHARE */
 async function shareTwitter(){
 
 try{
 
-// 1. Open Twitter immediately
+// open twitter immediately
 const message =
 "LOOK! I tried @pinkerverse's tiny @SpaceRidersXYZ generator 🚀\n\nGive it a go at www.pinkerverse.com/tinygenerator\n\n(Paste image link below 👇)";
 
-const tweet =
+window.open(
 "https://twitter.com/intent/tweet?text=" +
-encodeURIComponent(message);
+encodeURIComponent(message),
+"_blank"
+);
 
-window.open(tweet,"_blank");
-
-// 2. Upload image in background
+// upload
 const blob = await canvasToBlob();
 
 const formData = new FormData();
@@ -276,17 +286,24 @@ body:formData
 
 const data = await response.json();
 
+console.log("ImgBB response:", data);
+
+if(!data.success){
+throw new Error("Upload failed");
+}
+
 const imageURL = data.data.url;
 
-// 3. Copy AFTER upload
+// copy
 await navigator.clipboard.writeText(imageURL);
 
-// 4. Notify user
-alert("Image link copied! Paste it into your tweet (Cmd+V / Ctrl+V) 👍");
+// notify
+alert("Image link copied! Paste it into your tweet 👍");
 
 }catch(e){
 
-alert("Upload failed 😢");
+console.error(e);
+alert("Upload failed — try again or check connection");
 
 }
 
