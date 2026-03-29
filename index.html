@@ -54,41 +54,65 @@ cursor:pointer;
 font-size:13px;
 background:linear-gradient(135deg,#6366f1,#22d3ee);
 color:white;
+transition:0.2s;
+}
+
+button:hover{
+transform:scale(1.05);
+box-shadow:0 0 12px #22d3ee;
 }
 
 .donation{
 margin-top:15px;
 padding:12px;
-background:#1f2937;
+background:linear-gradient(135deg,#111827,#1f2937);
+border:1px solid rgba(255,255,255,0.1);
 border-radius:12px;
 font-size:12px;
+line-height:1.4;
+box-shadow:0 0 15px rgba(34,211,238,0.2);
 }
 
-/* IMAGE AREA */
-.imageWrapper{
+.shareGuide{
+margin-top:15px;
+padding:14px;
+background:linear-gradient(135deg,#1e293b,#0f172a);
+border-radius:12px;
+font-size:13px;
+line-height:1.5;
+box-shadow:0 0 20px rgba(34,211,238,0.15);
+}
+
+/* 🔥 WRAPPER FOR CANVAS */
+.canvasWrapper{
 position:relative;
 margin-top:20px;
 }
 
-/* FINAL IMAGE */
-#finalImage{
+/* KEEP YOUR CANVAS EXACTLY AS IS */
+canvas{
+border-radius:12px;
+background:black;
+box-shadow:0 0 30px rgba(0,0,0,0.9);
 width:100%;
 max-width:420px;
-border-radius:12px;
-box-shadow:0 0 30px rgba(0,0,0,0.9);
-display:none;
+height:auto;
 }
 
 /* PLACEHOLDER */
 .placeholder{
+position:absolute;
+top:0;
+left:50%;
+transform:translateX(-50%);
 width:100%;
 max-width:420px;
-height:420px;
-background:#111827;
-border-radius:12px;
+height:100%;
 display:flex;
 align-items:center;
 justify-content:center;
+background:#111827;
+border-radius:12px;
 font-size:14px;
 opacity:0.7;
 }
@@ -101,7 +125,7 @@ left:50%;
 transform:translateX(-50%);
 width:100%;
 max-width:420px;
-height:420px;
+height:100%;
 background:rgba(0,0,0,0.7);
 border-radius:12px;
 display:none;
@@ -125,8 +149,18 @@ margin-bottom:10px;
 100%{transform:rotate(360deg);}
 }
 
-canvas{
-display:none;
+@media (max-width: 600px){
+
+.container{
+padding:18px;
+}
+
+button{
+width:100%;
+margin:6px 0;
+font-size:14px;
+}
+
 }
 
 </style>
@@ -139,6 +173,8 @@ display:none;
 
 <h1>🚀 Space Riders Generator</h1>
 
+<p>Enter NFT ID or OpenSea link</p>
+
 <input id="nftInput" placeholder="4236 or OpenSea link">
 
 <br>
@@ -147,43 +183,65 @@ display:none;
 <button onclick="randomRider()">Random</button>
 
 <div class="donation">
-Support: pinkerverse.eth
+<b>❤️ Enjoying this generator?</b><br>
+Support us:<br><br>
+
+<b>ENS:</b> pinkerverse.eth<br>
+<b>ETH:</b> 0x75f8571F4Ca2f00321cdc2FA469019c0f185E798<br>
+<b>SOL:</b> BVSLNBZirqL1RWy724JeBFoa9wqgjuNwBdQKUxAjG1Tr<br><br>
+
+Thank you for your support 🚀
 </div>
 
-<div class="imageWrapper">
+<!-- 🔥 CANVAS WITH OVERLAY -->
+<div class="canvasWrapper">
 
-<div class="placeholder" id="placeholder">
+<canvas id="canvas" width="2000" height="2000"></canvas>
+
+<div id="placeholder" class="placeholder">
 Your Space Rider will appear here 🚀
 </div>
 
-<img id="finalImage">
-
-<div class="loading" id="loading">
+<div id="loading" class="loading">
 <div class="spinner"></div>
 Generating your Space Rider...
 </div>
 
 </div>
 
+<br>
+
+<button onclick="download()">Download</button>
+<button onclick="saveMobile()">Save Image (Mobile)</button>
+<button onclick="shareTwitter()">Share on X</button>
+
+<div class="shareGuide">
+<b>How to share your Space Rider:</b><br><br>
+
+<b>💻 Desktop:</b><br>
+Right-click the image → Copy Image → Paste into tweet<br><br>
+
+<b>📱 Mobile:</b><br>
+1. Tap <b>Save Image</b><br>
+2. Open X (Twitter)<br>
+3. Upload image<br><br>
+
+🚀 Done!
+</div>
+
 </div>
 
 <script>
 
-// ✅ 2000px CANVAS (MATCHES YOUR ASSETS)
-const canvas = document.createElement("canvas");
-canvas.width = 2000;
-canvas.height = 2000;
-
+const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-const finalImage = document.getElementById("finalImage");
-const loading = document.getElementById("loading");
 const placeholder = document.getElementById("placeholder");
+const loading = document.getElementById("loading");
 
 const BASE_URL =
 "https://ipfs.io/ipfs/Qma8e3QrAWVg4buufjUyLjFbjWJ7PKKNzehAct7kxgDFT6/";
 
-// glasses above hat
 const order = [
 "background",
 "shadow",
@@ -211,11 +269,12 @@ return str.toLowerCase().replace(/ /g,"_").replace(/[^a-z0-9_]/g,"");
 
 async function generate(){
 
+// show loading
 loading.style.display = "flex";
 placeholder.style.display = "none";
-finalImage.style.display = "none";
 
-const id = extractID(document.getElementById("nftInput").value);
+const raw = document.getElementById("nftInput").value;
+const id = extractID(raw);
 
 const response = await fetch(BASE_URL + id + ".json");
 const data = await response.json();
@@ -225,7 +284,7 @@ ctx.clearRect(0,0,canvas.width,canvas.height);
 for(const layer of order){
 
 if(layer === "shadow"){
-await draw("traits/shadow/default.png");
+await drawLayer("traits/shadow/default.png");
 continue;
 }
 
@@ -239,7 +298,7 @@ let path = "traits/" +
 cleanName(layer) + "/" +
 cleanName(trait.value) + ".png";
 
-await draw(path);
+await drawLayer(path);
 
 }
 
@@ -248,28 +307,45 @@ await draw(path);
 // hide loading
 loading.style.display = "none";
 
-// show image (no scaling distortion)
-finalImage.src = canvas.toDataURL("image/png");
-finalImage.style.display = "block";
-
 }
 
-function draw(src){
+function drawLayer(src){
 return new Promise(resolve=>{
 let img = new Image();
 img.src = src;
 img.onload = ()=>{
-ctx.drawImage(img,0,0,2000,2000); // ✅ FIXED
+ctx.drawImage(img,0,0,2000,2000);
 resolve();
 };
 img.onerror = ()=>resolve();
 });
 }
 
+function download(){
+const link = document.createElement("a");
+link.href = canvas.toDataURL("image/png");
+link.download = "space-rider.png";
+link.click();
+}
+
+function saveMobile(){
+download();
+}
+
 function randomRider(){
 document.getElementById("nftInput").value =
 Math.floor(Math.random()*8888);
 generate();
+}
+
+function shareTwitter(){
+const message =
+"LOOK! I tried @pinkerverse's tiny @SpaceRidersXYZ generator 🚀\n\nGive it a go at www.pinkerverse.com/tinygenerator\n\n(Paste image here 👇)";
+window.open(
+"https://twitter.com/intent/tweet?text=" +
+encodeURIComponent(message),
+"_blank"
+);
 }
 
 </script>
