@@ -83,14 +83,19 @@ line-height:1.5;
 box-shadow:0 0 20px rgba(34,211,238,0.15);
 }
 
-canvas{
+/* 🔥 IMAGE DISPLAY (replaces canvas visually) */
+#finalImage{
 margin-top:20px;
 border-radius:12px;
 background:black;
 box-shadow:0 0 30px rgba(0,0,0,0.9);
 width:100%;
 max-width:420px;
-height:auto;
+}
+
+/* hide canvas */
+canvas{
+display:none;
 }
 
 @media (max-width: 600px){
@@ -137,6 +142,9 @@ Support us:<br><br>
 Thank you for your support 🚀
 </div>
 
+<!-- 🔥 REAL IMAGE (LONG PRESS ENABLED) -->
+<img id="finalImage" src="" alt="Generated Space Rider">
+
 <canvas id="canvas" width="2048" height="2048"></canvas>
 
 <br>
@@ -152,9 +160,7 @@ Thank you for your support 🚀
 Right-click the image → Copy Image → Paste into tweet<br><br>
 
 <b>📱 Mobile:</b><br>
-1. Tap <b>Save Image</b><br>
-2. Open X (Twitter)<br>
-3. Create post → Upload image<br><br>
+Long press the image → Save / Copy → Upload to X<br><br>
 
 🚀 Done!
 </div>
@@ -165,11 +171,12 @@ Right-click the image → Copy Image → Paste into tweet<br><br>
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+const finalImage = document.getElementById("finalImage");
 
 const BASE_URL =
 "https://ipfs.io/ipfs/Qma8e3QrAWVg4buufjUyLjFbjWJ7PKKNzehAct7kxgDFT6/";
 
-// ✅ FIXED LAYER ORDER (GLASSES ABOVE HAT)
+// glasses above hat
 const order = [
 "background",
 "shadow",
@@ -206,9 +213,7 @@ async function generate(){
 const raw = document.getElementById("nftInput").value;
 const id = extractID(raw);
 
-const url = BASE_URL + id + ".json";
-
-const response = await fetch(url);
+const response = await fetch(BASE_URL + id + ".json");
 const data = await response.json();
 
 const traits = data.attributes;
@@ -228,16 +233,18 @@ t.trait_type.toLowerCase() === layer
 
 if(trait){
 
-let folder = cleanName(layer);
-let file = cleanName(trait.value);
-
-let path = "traits/" + folder + "/" + file + ".png";
+let path = "traits/" +
+cleanName(layer) + "/" +
+cleanName(trait.value) + ".png";
 
 await drawLayer(path);
 
 }
 
 }
+
+// 🔥 CONVERT CANVAS → IMAGE (KEY FIX)
+finalImage.src = canvas.toDataURL("image/png");
 
 }
 
@@ -272,15 +279,7 @@ document.body.removeChild(link);
 }
 
 function saveMobile(){
-
-const link = document.createElement("a");
-link.href = canvas.toDataURL("image/png");
-link.download = "space-rider.png";
-
-document.body.appendChild(link);
-link.click();
-document.body.removeChild(link);
-
+download();
 }
 
 function randomRider(){
