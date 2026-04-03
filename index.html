@@ -62,6 +62,11 @@ transform:scale(1.05);
 box-shadow:0 0 12px #22d3ee;
 }
 
+button:disabled{
+opacity:0.5;
+cursor:not-allowed;
+}
+
 /* DONATION */
 .donation{
 margin-top:18px;
@@ -85,49 +90,18 @@ margin-top:4px;
 word-break:break-all;
 }
 
-.shareGuide{
-margin-top:15px;
-padding:14px;
-background:linear-gradient(135deg,#1e293b,#0f172a);
-border-radius:12px;
-font-size:13px;
-line-height:1.5;
-box-shadow:0 0 20px rgba(34,211,238,0.15);
-}
-
-/* WRAPPER */
 .canvasWrapper{
 position:relative;
 margin-top:20px;
-}
-
-/* FINAL IMAGE */
-#finalImage{
-width:100%;
-max-width:420px;
-border-radius:12px;
-display:none;
-opacity:0;
-transition:opacity 0.5s ease;
-box-shadow:0 0 30px rgba(0,0,0,0.9);
-z-index:2;
-position:relative;
-}
-
-/* 🔥 HIDE CANVAS COMPLETELY */
-canvas{
-display:none;
+display:flex;
+justify-content:center;
 }
 
 /* PLACEHOLDER */
 .placeholder{
-position:absolute;
-top:0;
-left:50%;
-transform:translateX(-50%);
 width:100%;
 max-width:420px;
-height:100%;
+height:420px;
 display:flex;
 align-items:center;
 justify-content:center;
@@ -135,7 +109,28 @@ background:#111827;
 border-radius:12px;
 font-size:14px;
 opacity:0.7;
-z-index:3;
+}
+
+/* IMAGE */
+#finalImage{
+position:absolute;
+top:0;
+left:50%;
+transform:translateX(-50%);
+width:100%;
+max-width:420px;
+border-radius:12px;
+display:none;
+opacity:0;
+transition:opacity 0.5s ease, transform 0.4s ease;
+box-shadow:0 0 30px rgba(0,0,0,0.9);
+z-index:2;
+}
+
+/* glow effect */
+#finalImage.active{
+transform:translateX(-50%) scale(1.02);
+box-shadow:0 0 40px rgba(34,211,238,0.35);
 }
 
 /* LOADING */
@@ -146,7 +141,7 @@ left:50%;
 transform:translateX(-50%);
 width:100%;
 max-width:420px;
-height:100%;
+height:420px;
 background:rgba(0,0,0,0.7);
 border-radius:12px;
 display:none;
@@ -171,18 +166,26 @@ margin-bottom:10px;
 100%{transform:rotate(360deg);}
 }
 
-/* 🔥 TAP HINT */
+/* TAP HINT */
 .tapHint{
 margin-top:10px;
 font-size:12px;
 opacity:0;
-animation:fadeHint 2s ease forwards;
+}
+
+.tapHint.show{
+animation:fadeHint 2s ease;
 }
 
 @keyframes fadeHint{
 0%{opacity:0;}
-50%{opacity:0.8;}
+50%{opacity:0.9;}
 100%{opacity:0;}
+}
+
+/* HIDE CANVAS */
+canvas{
+display:none;
 }
 
 @media (max-width: 600px){
@@ -206,7 +209,7 @@ button{width:100%;margin:6px 0;font-size:14px;}
 
 <br>
 
-<button onclick="generate()">Generate</button>
+<button id="genBtn" onclick="generate()">Generate</button>
 <button onclick="randomRider()">Random</button>
 
 <div class="donation">
@@ -221,16 +224,15 @@ If you like it, consider supporting 💙<br><br>
 
 <b>SOL:</b><br>
 <div class="wallet">BVSLNBZirqL1RWy724JeBFoa9wqgjuNwBdQKUxAjG1Tr</div>
-
 </div>
 
 <div class="canvasWrapper">
 
-<img id="finalImage">
-
-<div id="placeholder" class="placeholder">
+<div class="placeholder">
 Your Space Rider will appear here 🚀
 </div>
+
+<img id="finalImage">
 
 <div id="loading" class="loading">
 <div class="spinner"></div>
@@ -249,18 +251,6 @@ Generating your Space Rider...
 <button onclick="saveMobile()">Save Image (Mobile)</button>
 <button onclick="shareTwitter()">Share on X</button>
 
-<div class="shareGuide">
-<b>How to share your Space Rider:</b><br><br>
-
-<b>💻 Desktop:</b><br>
-Right-click the image → Copy Image → Paste into tweet<br><br>
-
-<b>📱 Mobile:</b><br>
-Long press the image → Save / Copy → Upload to X<br><br>
-
-🚀 Done!
-</div>
-
 </div>
 
 <script>
@@ -270,10 +260,10 @@ canvas.width = 2000;
 canvas.height = 2000;
 const ctx = canvas.getContext("2d");
 
-const placeholder = document.getElementById("placeholder");
 const loading = document.getElementById("loading");
 const finalImage = document.getElementById("finalImage");
 const hint = document.getElementById("hint");
+const genBtn = document.getElementById("genBtn");
 
 const BASE_URL =
 "https://ipfs.io/ipfs/Qma8e3QrAWVg4buufjUyLjFbjWJ7PKKNzehAct7kxgDFT6/";
@@ -306,10 +296,10 @@ return str.toLowerCase().replace(/ /g,"_").replace(/[^a-z0-9_]/g,"");
 
 async function generate(){
 
+genBtn.disabled = true;
 loading.style.display = "flex";
-placeholder.style.display = "none";
 finalImage.style.display = "none";
-finalImage.style.opacity = 0;
+finalImage.classList.remove("active");
 
 const id = extractID(document.getElementById("nftInput").value);
 
@@ -335,30 +325,28 @@ t.trait_type.toLowerCase() === layer
 );
 
 if(trait){
-
-let path = "traits/" +
-cleanName(layer) + "/" +
-cleanName(trait.value) + ".png";
-
+let path = "traits/" + cleanName(layer) + "/" + cleanName(trait.value) + ".png";
 await drawLayer(path);
-
 }
 
 }
 
-// show image smoothly
 loading.style.display = "none";
+
 finalImage.src = canvas.toDataURL("image/png");
 finalImage.style.display = "block";
 
 setTimeout(()=>{
 finalImage.style.opacity = 1;
+finalImage.classList.add("active");
 },50);
 
-// show hint briefly
-hint.style.animation = "none";
+// hint animation
+hint.classList.remove("show");
 void hint.offsetWidth;
-hint.style.animation = "fadeHint 2s ease";
+hint.classList.add("show");
+
+genBtn.disabled = false;
 
 }
 
