@@ -62,7 +62,7 @@ transform:scale(1.05);
 box-shadow:0 0 12px #22d3ee;
 }
 
-/* 🔥 IMPROVED DONATION BOX */
+/* DONATION */
 .donation{
 margin-top:18px;
 padding:16px;
@@ -74,7 +74,6 @@ line-height:1.5;
 box-shadow:0 0 20px rgba(34,211,238,0.25);
 }
 
-/* 🔥 MONOSPACE FOR ADDRESSES */
 .wallet{
 font-family:'JetBrains Mono', monospace;
 font-size:13px;
@@ -96,20 +95,31 @@ line-height:1.5;
 box-shadow:0 0 20px rgba(34,211,238,0.15);
 }
 
+/* WRAPPER */
 .canvasWrapper{
 position:relative;
 margin-top:20px;
 }
 
-canvas{
-border-radius:12px;
-background:black;
-box-shadow:0 0 30px rgba(0,0,0,0.9);
+/* FINAL IMAGE */
+#finalImage{
 width:100%;
 max-width:420px;
-height:auto;
+border-radius:12px;
+display:none;
+opacity:0;
+transition:opacity 0.5s ease;
+box-shadow:0 0 30px rgba(0,0,0,0.9);
+z-index:2;
+position:relative;
 }
 
+/* 🔥 HIDE CANVAS COMPLETELY */
+canvas{
+display:none;
+}
+
+/* PLACEHOLDER */
 .placeholder{
 position:absolute;
 top:0;
@@ -125,8 +135,10 @@ background:#111827;
 border-radius:12px;
 font-size:14px;
 opacity:0.7;
+z-index:3;
 }
 
+/* LOADING */
 .loading{
 position:absolute;
 top:0;
@@ -141,6 +153,7 @@ display:none;
 align-items:center;
 justify-content:center;
 flex-direction:column;
+z-index:4;
 }
 
 .spinner{
@@ -156,6 +169,20 @@ margin-bottom:10px;
 @keyframes spin{
 0%{transform:rotate(0deg);}
 100%{transform:rotate(360deg);}
+}
+
+/* 🔥 TAP HINT */
+.tapHint{
+margin-top:10px;
+font-size:12px;
+opacity:0;
+animation:fadeHint 2s ease forwards;
+}
+
+@keyframes fadeHint{
+0%{opacity:0;}
+50%{opacity:0.8;}
+100%{opacity:0;}
 }
 
 @media (max-width: 600px){
@@ -182,7 +209,6 @@ button{width:100%;margin:6px 0;font-size:14px;}
 <button onclick="generate()">Generate</button>
 <button onclick="randomRider()">Random</button>
 
-<!-- 🔥 UPDATED DONATION -->
 <div class="donation">
 <b>❤️ Enjoying this generator?</b><br>
 If you like it, consider supporting 💙<br><br>
@@ -200,7 +226,7 @@ If you like it, consider supporting 💙<br><br>
 
 <div class="canvasWrapper">
 
-<canvas id="canvas" width="2000" height="2000"></canvas>
+<img id="finalImage">
 
 <div id="placeholder" class="placeholder">
 Your Space Rider will appear here 🚀
@@ -211,6 +237,10 @@ Your Space Rider will appear here 🚀
 Generating your Space Rider...
 </div>
 
+</div>
+
+<div id="hint" class="tapHint">
+📱 Tap & hold image to save
 </div>
 
 <br>
@@ -226,9 +256,7 @@ Generating your Space Rider...
 Right-click the image → Copy Image → Paste into tweet<br><br>
 
 <b>📱 Mobile:</b><br>
-1. Tap <b>Save Image</b><br>
-2. Open X (Twitter)<br>
-3. Upload image<br><br>
+Long press the image → Save / Copy → Upload to X<br><br>
 
 🚀 Done!
 </div>
@@ -237,11 +265,15 @@ Right-click the image → Copy Image → Paste into tweet<br><br>
 
 <script>
 
-const canvas = document.getElementById("canvas");
+const canvas = document.createElement("canvas");
+canvas.width = 2000;
+canvas.height = 2000;
 const ctx = canvas.getContext("2d");
 
 const placeholder = document.getElementById("placeholder");
 const loading = document.getElementById("loading");
+const finalImage = document.getElementById("finalImage");
+const hint = document.getElementById("hint");
 
 const BASE_URL =
 "https://ipfs.io/ipfs/Qma8e3QrAWVg4buufjUyLjFbjWJ7PKKNzehAct7kxgDFT6/";
@@ -276,9 +308,10 @@ async function generate(){
 
 loading.style.display = "flex";
 placeholder.style.display = "none";
+finalImage.style.display = "none";
+finalImage.style.opacity = 0;
 
-const raw = document.getElementById("nftInput").value;
-const id = extractID(raw);
+const id = extractID(document.getElementById("nftInput").value);
 
 const response = await fetch(BASE_URL + id + ".json");
 const data = await response.json();
@@ -313,7 +346,19 @@ await drawLayer(path);
 
 }
 
+// show image smoothly
 loading.style.display = "none";
+finalImage.src = canvas.toDataURL("image/png");
+finalImage.style.display = "block";
+
+setTimeout(()=>{
+finalImage.style.opacity = 1;
+},50);
+
+// show hint briefly
+hint.style.animation = "none";
+void hint.offsetWidth;
+hint.style.animation = "fadeHint 2s ease";
 
 }
 
