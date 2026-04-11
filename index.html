@@ -30,19 +30,15 @@ box-shadow:0 0 40px rgba(0,0,0,0.7);
 text-align:center;
 }
 
-h1{
-margin:10px 0;
-font-size:24px;
-}
+h1{margin:10px 0;font-size:24px;}
 
-input{
-padding:12px;
-font-size:14px;
-width:90%;
-border-radius:10px;
+input, select{
+padding:10px;
+font-size:13px;
+margin:5px;
+border-radius:8px;
 border:none;
 outline:none;
-margin-top:10px;
 }
 
 button{
@@ -97,7 +93,6 @@ display:flex;
 justify-content:center;
 }
 
-/* PLACEHOLDER */
 .placeholder{
 width:100%;
 max-width:420px;
@@ -111,7 +106,6 @@ font-size:14px;
 opacity:0.7;
 }
 
-/* IMAGE */
 #finalImage{
 position:absolute;
 top:0;
@@ -127,13 +121,11 @@ box-shadow:0 0 30px rgba(0,0,0,0.9);
 z-index:2;
 }
 
-/* glow effect */
 #finalImage.active{
 transform:translateX(-50%) scale(1.02);
 box-shadow:0 0 40px rgba(34,211,238,0.35);
 }
 
-/* LOADING */
 .loading{
 position:absolute;
 top:0;
@@ -166,7 +158,6 @@ margin-bottom:10px;
 100%{transform:rotate(360deg);}
 }
 
-/* TAP HINT */
 .tapHint{
 margin-top:10px;
 font-size:12px;
@@ -183,10 +174,7 @@ animation:fadeHint 2s ease;
 100%{opacity:0;}
 }
 
-/* HIDE CANVAS */
-canvas{
-display:none;
-}
+canvas{display:none;}
 
 @media (max-width: 600px){
 .container{padding:18px;}
@@ -211,6 +199,22 @@ button{width:100%;margin:6px 0;font-size:14px;}
 
 <button id="genBtn" onclick="generate()">Generate</button>
 <button onclick="randomRider()">Random</button>
+
+<hr style="margin:20px 0; opacity:0.2;">
+
+<h3>Create Your Own Rider</h3>
+
+<select id="background"><option value="">Background</option></select>
+<select id="body"><option value="">Body</option></select>
+<select id="head"><option value="">Head</option></select>
+<select id="eyes"><option value="">Eyes</option></select>
+<select id="mouth"><option value="">Mouth</option></select>
+<select id="hat"><option value="">Hat</option></select>
+<select id="glasses"><option value="">Glasses</option></select>
+
+<br>
+
+<button onclick="generateCustom()">Create Rider</button>
 
 <div class="donation">
 <b>❤️ Enjoying this generator?</b><br>
@@ -265,128 +269,124 @@ const finalImage = document.getElementById("finalImage");
 const hint = document.getElementById("hint");
 const genBtn = document.getElementById("genBtn");
 
-const BASE_URL =
-"https://ipfs.io/ipfs/Qma8e3QrAWVg4buufjUyLjFbjWJ7PKKNzehAct7kxgDFT6/";
+const BASE_URL = "https://ipfs.io/ipfs/Qma8e3QrAWVg4buufjUyLjFbjWJ7PKKNzehAct7kxgDFT6/";
 
-const order = [
-"background",
-"shadow",
-"body",
-"head",
-"cheeks",
-"eyes",
-"mouth",
-"hat",
-"glasses",
-"space shine"
-];
+const order = ["background","shadow","body","head","cheeks","eyes","mouth","hat","glasses","space shine"];
 
 function extractID(input){
 if(input.includes("opensea")){
-let parts = input.split("/");
+let parts=input.split("/");
 return parts[parts.length-1];
 }
 return input;
 }
 
 function cleanName(str){
-if(str === "^") return "caret";
+if(str==="^") return "caret";
 return str.toLowerCase().replace(/ /g,"_").replace(/[^a-z0-9_]/g,"");
 }
 
 async function generate(){
 
-genBtn.disabled = true;
-loading.style.display = "flex";
-finalImage.style.display = "none";
+genBtn.disabled=true;
+loading.style.display="flex";
+finalImage.style.display="none";
+finalImage.style.opacity=0;
 finalImage.classList.remove("active");
 
-const id = extractID(document.getElementById("nftInput").value);
+const id=extractID(document.getElementById("nftInput").value);
 
-const response = await fetch(BASE_URL + id + ".json");
-const data = await response.json();
+const res=await fetch(BASE_URL+id+".json");
+const data=await res.json();
 
-ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.clearRect(0,0,2000,2000);
 
 for(const layer of order){
 
-if(layer === "shadow"){
-await drawLayer("traits/shadow/default.png");
-continue;
-}
+if(layer==="shadow"){await draw("traits/shadow/default.png");continue;}
+if(layer==="cheeks"){await draw("traits/cheeks/default.png");continue;}
 
-if(layer === "cheeks"){
-await drawLayer("traits/cheeks/default.png");
-continue;
-}
-
-const trait = data.attributes.find(t =>
-t.trait_type.toLowerCase() === layer
-);
-
+const trait=data.attributes.find(t=>t.trait_type.toLowerCase()===layer);
 if(trait){
-let path = "traits/" + cleanName(layer) + "/" + cleanName(trait.value) + ".png";
-await drawLayer(path);
+await draw("traits/"+cleanName(layer)+"/"+cleanName(trait.value)+".png");
 }
 
 }
 
-loading.style.display = "none";
+finish();
+}
 
-finalImage.src = canvas.toDataURL("image/png");
-finalImage.style.display = "block";
+async function generateCustom(){
+
+genBtn.disabled=true;
+loading.style.display="flex";
+finalImage.style.display="none";
+finalImage.style.opacity=0;
+finalImage.classList.remove("active");
+
+ctx.clearRect(0,0,2000,2000);
+
+for(const layer of order){
+
+if(layer==="shadow"){await draw("traits/shadow/default.png");continue;}
+if(layer==="cheeks"){await draw("traits/cheeks/default.png");continue;}
+
+const value=document.getElementById(layer)?.value;
+
+if(value){
+await draw("traits/"+layer+"/"+value+".png");
+}
+
+}
+
+finish();
+}
+
+function finish(){
+
+loading.style.display="none";
+
+finalImage.src=canvas.toDataURL("image/png");
+finalImage.style.display="block";
 
 setTimeout(()=>{
-finalImage.style.opacity = 1;
+finalImage.style.opacity=1;
 finalImage.classList.add("active");
 },50);
 
-// hint animation
 hint.classList.remove("show");
 void hint.offsetWidth;
 hint.classList.add("show");
 
-genBtn.disabled = false;
-
+genBtn.disabled=false;
 }
 
-function drawLayer(src){
-return new Promise(resolve=>{
-let img = new Image();
-img.src = src;
-img.onload = ()=>{
-ctx.drawImage(img,0,0,2000,2000);
-resolve();
-};
-img.onerror = ()=>resolve();
+function draw(src){
+return new Promise(r=>{
+let img=new Image();
+img.src=src;
+img.onload=()=>{ctx.drawImage(img,0,0,2000,2000);r();}
+img.onerror=()=>r();
 });
 }
 
 function download(){
-const link = document.createElement("a");
-link.href = canvas.toDataURL("image/png");
-link.download = "space-rider.png";
+const link=document.createElement("a");
+link.href=canvas.toDataURL();
+link.download="space-rider.png";
 link.click();
 }
 
-function saveMobile(){
-download();
-}
+function saveMobile(){download();}
 
 function randomRider(){
-document.getElementById("nftInput").value =
-Math.floor(Math.random()*8888);
+document.getElementById("nftInput").value=Math.floor(Math.random()*8888);
 generate();
 }
 
 function shareTwitter(){
-const message =
-"LOOK! I tried @pinkerverse's tiny @SpaceRidersXYZ generator 🚀\n\nGive it a go at www.pinkerverse.com/tinygenerator\n\n(Paste image here 👇)";
-window.open(
-"https://twitter.com/intent/tweet?text=" +
-encodeURIComponent(message),
-"_blank"
-);
+const msg="LOOK! I tried @pinkerverse's tiny @SpaceRidersXYZ generator 🚀\n\n(Paste image here 👇)";
+window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent(msg));
 }
 
 </script>
