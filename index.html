@@ -362,7 +362,9 @@ for(const l of order){
 if(l==="shadow"){await draw("traits/shadow/default.png");continue;}
 if(l==="cheeks"){await draw("traits/cheeks/default.png");continue;}
 
-const t=data.attributes.find(a=>a.trait_type.toLowerCase()===l);
+const t = data.attributes.find(
+a => a.trait_type.toLowerCase().replace(/ /g,"_") === l
+);
 
 if(t){
 await draw("traits/"+l+"/"+clean(t.value)+".png");
