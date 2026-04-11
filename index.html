@@ -9,8 +9,6 @@
 
 <style>
 
-/* === YOUR ORIGINAL STYLES (UNCHANGED) === */
-
 body{
 margin:0;
 font-family:'Orbitron', sans-serif;
@@ -69,28 +67,6 @@ opacity:0.5;
 cursor:not-allowed;
 }
 
-.donation{
-margin-top:18px;
-padding:16px;
-background:linear-gradient(135deg,#1e293b,#020617);
-border:1px solid rgba(34,211,238,0.4);
-border-radius:14px;
-font-size:13px;
-line-height:1.5;
-box-shadow:0 0 20px rgba(34,211,238,0.25);
-}
-
-.wallet{
-font-family:'JetBrains Mono', monospace;
-font-size:13px;
-background:rgba(255,255,255,0.05);
-padding:6px 8px;
-border-radius:6px;
-display:inline-block;
-margin-top:4px;
-word-break:break-all;
-}
-
 .canvasWrapper{
 position:relative;
 margin-top:20px;
@@ -107,7 +83,6 @@ align-items:center;
 justify-content:center;
 background:#111827;
 border-radius:12px;
-font-size:14px;
 opacity:0.7;
 }
 
@@ -122,8 +97,6 @@ border-radius:12px;
 display:none;
 opacity:0;
 transition:opacity 0.5s ease, transform 0.4s ease;
-box-shadow:0 0 30px rgba(0,0,0,0.9);
-z-index:2;
 }
 
 #finalImage.active{
@@ -144,7 +117,6 @@ border-radius:12px;
 display:none;
 align-items:center;
 justify-content:center;
-flex-direction:column;
 z-index:4;
 }
 
@@ -155,11 +127,9 @@ border-radius:50%;
 width:40px;
 height:40px;
 animation:spin 1s linear infinite;
-margin-bottom:10px;
 }
 
 @keyframes spin{
-0%{transform:rotate(0deg);}
 100%{transform:rotate(360deg);}
 }
 
@@ -174,12 +144,22 @@ animation:fadeHint 2s ease;
 }
 
 @keyframes fadeHint{
-0%{opacity:0;}
 50%{opacity:0.9;}
-100%{opacity:0;}
+}
+
+.wallet{
+font-family:'JetBrains Mono', monospace;
+margin-top:10px;
+font-size:12px;
 }
 
 canvas{display:none;}
+
+select{
+margin:4px;
+padding:8px;
+border-radius:8px;
+}
 
 </style>
 
@@ -191,16 +171,12 @@ canvas{display:none;}
 
 <h1>🚀 Space Riders Generator</h1>
 
-<p>Enter NFT ID or OpenSea link</p>
-
-<input id="nftInput" placeholder="4236 or OpenSea link">
+<input id="nftInput" placeholder="NFT ID or OpenSea link">
 
 <br>
 
 <button id="genBtn" onclick="generate()">Generate</button>
 <button onclick="randomRider()">Random</button>
-
-<!-- ===== BUILDER UI ADDED (ONLY ADDITION) ===== -->
 
 <hr style="margin:20px 0; opacity:0.2;">
 
@@ -218,22 +194,6 @@ canvas{display:none;}
 
 <button onclick="generateCustom()">Create Rider</button>
 
-<!-- ===== ORIGINAL CONTINUES ===== -->
-
-<div class="donation">
-<b>❤️ Enjoying this generator?</b><br>
-If you like it, consider supporting 💙<br><br>
-
-<b>ENS:</b><br>
-<div class="wallet">pinkerverse.eth</div><br>
-
-<b>ETH:</b><br>
-<div class="wallet">0x75f8571F4Ca2f00321cdc2FA469019c0f185E798</div><br>
-
-<b>SOL:</b><br>
-<div class="wallet">BVSLNBZirqL1RWy724JeBFoa9wqgjuNwBdQKUxAjG1Tr</div>
-</div>
-
 <div class="canvasWrapper">
 
 <div class="placeholder">
@@ -244,7 +204,6 @@ Your Space Rider will appear here 🚀
 
 <div id="loading" class="loading">
 <div class="spinner"></div>
-Generating your Space Rider...
 </div>
 
 </div>
@@ -256,108 +215,90 @@ Generating your Space Rider...
 <br>
 
 <button onclick="download()">Download</button>
-<button onclick="saveMobile()">Save Image (Mobile)</button>
-<button onclick="shareTwitter()">Share on X</button>
+
+<div class="wallet">
+Support: pinkerverse.eth
+</div>
 
 </div>
 
 <script>
 
-/* ===== ORIGINAL VARIABLES ===== */
-
-const canvas = document.createElement("canvas");
-canvas.width = 2000;
-canvas.height = 2000;
-const ctx = canvas.getContext("2d");
-
-const loading = document.getElementById("loading");
-const finalImage = document.getElementById("finalImage");
-const hint = document.getElementById("hint");
-const genBtn = document.getElementById("genBtn");
-
-const BASE_URL =
-"https://ipfs.io/ipfs/Qma8e3QrAWVg4buufjUyLjFbjWJ7PKKNzehAct7kxgDFT6/";
-
-const order = [
-"background",
-"shadow",
-"body",
-"head",
-"cheeks",
-"eyes",
-"mouth",
-"hat",
-"glasses",
-"space shine"
-];
-
-/* ===== ORIGINAL FUNCTIONS ===== */
-
-function extractID(input){
-if(input.includes("opensea")){
-let parts = input.split("/");
-return parts[parts.length-1];
-}
-return input;
-}
-
-function cleanName(str){
-if(str === "^") return "caret";
-return str.toLowerCase().replace(/ /g,"_").replace(/[^a-z0-9_]/g,"");
-}
-
-/* ===== ORIGINAL GENERATOR (UNCHANGED) ===== */
-
-async function generate(){
-
-genBtn.disabled = true;
-loading.style.display = "flex";
-finalImage.style.display = "none";
-finalImage.classList.remove("active");
-
-const id = extractID(document.getElementById("nftInput").value);
-
-const response = await fetch(BASE_URL + id + ".json");
-const data = await response.json();
-
-ctx.clearRect(0,0,canvas.width,canvas.height);
-
-for(const layer of order){
-
-if(layer === "shadow"){
-await drawLayer("traits/shadow/default.png");
-continue;
-}
-
-if(layer === "cheeks"){
-await drawLayer("traits/cheeks/default.png");
-continue;
-}
-
-const trait = data.attributes.find(t =>
-t.trait_type.toLowerCase() === layer
-);
-
-if(trait){
-let path = "traits/" + cleanName(layer) + "/" + cleanName(trait.value) + ".png";
-await drawLayer(path);
-}
-
-}
-
-finish();
-}
-
-/* ===== BUILDER ADDITION ===== */
+/* ===== FULL TRAITS ===== */
 
 const TRAITS = {
-background:["blue","red","green","purple"],
-body:["sr_blue_suit_v2","sr_red_suit","sr_green_suit"],
-head:["blue","green","purple"],
-eyes:["normal","happy","angry"],
-mouth:["smile","smirk","uwu"],
-hat:["blue_cap","crown","beanie"],
-glasses:["regular","vr"]
+
+background:[
+"white","red_deluxe","green","ultramarine","blue","orange","solar_flare",
+"light_purple_deluxe","light_purple","old_legendary","blank_space","purple",
+"yellow","aquamarine","purple_deluxe","red","pink_deluxe","emerald",
+"ultramarine_deluxe","light_pink_deluxe","starry_night","pink","orange_deluxe",
+"celestial_purple_void","blue_deluxe","celestial_emerald","aquamarine_deluxe",
+"diamond","sn_2021","green_deluxe","blood_moon","celestial_solar_flare",
+"light_pink","sn_2022","yellow_deluxe","moonlight","deep_night","sn_2929",
+"celestial_moonlight","celestial_void","celestial_diamond",
+"celestial_blood_moon","flat_legendary"
+],
+
+body:[
+"sr_blue_suit_v2","sr_ultramarine_suit","gn_hoodie","sr_black_suit_v2",
+"saturn_sweater","sr_aquamarine_suit_v2","sr_pink_suit_v2","terra_turtleneck",
+"blue_college_jacket","sr_purple_suit","sr_red_suit","sr_green_suit",
+"star_glow","srog_hoodie","black_sport_hoodie","sr_ultramarine_suit_v2",
+"sr_purple_suit_v2","black_turtleneck","sr_green_suit_v2",
+"legendary_space_hoodie","tuxedo","peaky_suit","red_college_jacket",
+"sr_light_purple_suit_v2","sr_white_suit","dark_cloak","heavy_hoodie",
+"blue_turtleneck","saturn_overalls","poncho","captain_suit","rider_jacket",
+"sr_aquamarine_suit","space_rider","doodle_wave","blue_sport_hoodie",
+"moon_overalls","sr_white_suit_v2","sr_black_suit","sr_red_suit_v2",
+"star_hoodie","sr_blue_suit","yellow_bomber_jacket","purple_sr_hoodie",
+"sr_light_purple_suit","grey_cape","sr_pink_suit","sr_hoodie","cloak",
+"old_legendary_turtleneck","sr_icon_hoodie","divine_robe","suspenders",
+"moon_sweater","pink_turtleneck","pink_bomber_jacket","sr_yellow_suit_v2",
+"sr_orange_suit","black_star_hoodie","purple_turtleneck","sr_orange_suit_v2",
+"riders_hoodie","srgg_hoodie","ninja_suit","viking_suit","sheriff",
+"zip_up_hoodie","sr_yellow_suit","gm_hoodie","red_sport_hoodie",
+"swim_suit","hippie_suit","kimono","samurai_suit","purple_cape",
+"pirate","srgg_uniform","s3r0_suit","intergalactic_uniform"
+],
+
+head:[
+"robot","deep_sea","jupiter","deep_space","light_purple","light_green",
+"solar_flare","blush","red","sky","blue_marble","mint","blue_bowling_ball",
+"purple","pink","water_bowl","sun","blood_moon","nova","tennis_ball",
+"white","red_marble","purple_bowling_ball","watermelon","orange","melting",
+"slam_dunk","blue","green","lavender","open_sea","s3r0_head","silver",
+"yellow","home_run","golden","red_bowling_ball","transparent",
+"ultramarine","purple_marble","yellow_marble","lemon"
+],
+
+eyes:[
+"raised_eyebrow","normal","closed","concerned","judging","cross_eyed",
+"mad","tired","calm","third_eye","wink","side_eye","patch","crying",
+"messed_up","happy","in_love","roboface","evil","dot","scarface","white"
+],
+
+mouth:[
+"sad","mustache","regular","happy","basic","vampire","drool","dino_smile",
+"discreet","smirk","cigarette","caret","lollipop","smile","buck_tooth",
+"uwu","joint","bubble_gum"
+],
+
+hat:[
+"blue_cap","horns","olive_crown","headphones","purple_bandana","sr_planet",
+"planetary_cap","home_planet","red_cap","red_bandana","pink_cap",
+"hippie_bandana","halo","captain","pink_beanie","yellow_beanie","kitsune",
+"headband","mohawk","visor","grey_beanie","lollipop","elegant_hat",
+"blue_bucket_hat","ninja_band","viking_helmet","purple_cap","ufo",
+"trucker_hat","beret","black_trucker_hat","black_cap","nova_bucket_hat",
+"chocolate","black_crown","black_bucket_hat","pirate","punk","cowboy",
+"crown","saturn","sheriff","peaky_hat","ronin_helmet",
+"construction_helmet","lord_of_terror","swim_cap","ninja_mask",
+"sombrero","wizard"
+],
+
+glasses:["monocle","regular","rocketman","vr","vb","gradient"]
+
 };
 
 /* populate dropdowns */
@@ -373,31 +314,58 @@ select.appendChild(option);
 });
 }
 
-/* builder render */
-async function generateCustom(){
+/* ===== ENGINE ===== */
 
-loading.style.display = "flex";
-finalImage.style.display = "none";
-finalImage.classList.remove("active");
+const canvas=document.createElement("canvas");
+canvas.width=2000;
+canvas.height=2000;
+const ctx=canvas.getContext("2d");
 
-ctx.clearRect(0,0,canvas.width,canvas.height);
+const img=document.getElementById("finalImage");
+const load=document.getElementById("loading");
+const hint=document.getElementById("hint");
+const genBtn=document.getElementById("genBtn");
 
-for(const layer of order){
+const BASE="https://ipfs.io/ipfs/Qma8e3QrAWVg4buufjUyLjFbjWJ7PKKNzehAct7kxgDFT6/";
 
-if(layer === "shadow"){
-await drawLayer("traits/shadow/default.png");
-continue;
+const order=["background","shadow","body","head","cheeks","eyes","mouth","hat","glasses","space shine"];
+
+function clean(str){
+if(str==="^") return "caret";
+return str.toLowerCase().replace(/ /g,"_").replace(/[^a-z0-9_]/g,"");
 }
 
-if(layer === "cheeks"){
-await drawLayer("traits/cheeks/default.png");
-continue;
+function draw(src){
+return new Promise(r=>{
+let i=new Image();
+i.src=src;
+i.onload=()=>{ctx.drawImage(i,0,0,2000,2000);r();}
+i.onerror=()=>r();
+});
 }
 
-const value = document.getElementById(layer)?.value;
+/* ===== GENERATOR ===== */
 
-if(value){
-await drawLayer("traits/" + layer + "/" + value + ".png");
+async function generate(){
+
+genBtn.disabled=true;
+load.style.display="flex";
+
+const id=document.getElementById("nftInput").value;
+const res=await fetch(BASE+id+".json");
+const data=await res.json();
+
+ctx.clearRect(0,0,2000,2000);
+
+for(const l of order){
+
+if(l==="shadow"){await draw("traits/shadow/default.png");continue;}
+if(l==="cheeks"){await draw("traits/cheeks/default.png");continue;}
+
+const t=data.attributes.find(a=>a.trait_type.toLowerCase()===l);
+
+if(t){
+await draw("traits/"+l+"/"+clean(t.value)+".png");
 }
 
 }
@@ -405,65 +373,60 @@ await drawLayer("traits/" + layer + "/" + value + ".png");
 finish();
 }
 
-/* ===== ORIGINAL FINISH + HELPERS ===== */
+/* ===== BUILDER ===== */
+
+async function generateCustom(){
+
+load.style.display="flex";
+ctx.clearRect(0,0,2000,2000);
+
+for(const l of order){
+
+if(l==="shadow"){await draw("traits/shadow/default.png");continue;}
+if(l==="cheeks"){await draw("traits/cheeks/default.png");continue;}
+
+const v=document.getElementById(l)?.value;
+
+if(v){
+await draw("traits/"+l+"/"+v+".png");
+}
+
+}
+
+finish();
+}
+
+/* ===== FINISH ===== */
 
 function finish(){
-
-loading.style.display = "none";
-
-finalImage.src = canvas.toDataURL("image/png");
-finalImage.style.display = "block";
+load.style.display="none";
+img.src=canvas.toDataURL();
+img.style.display="block";
 
 setTimeout(()=>{
-finalImage.style.opacity = 1;
-finalImage.classList.add("active");
+img.style.opacity=1;
+img.classList.add("active");
 },50);
 
 hint.classList.remove("show");
 void hint.offsetWidth;
 hint.classList.add("show");
 
-genBtn.disabled = false;
-
+genBtn.disabled=false;
 }
 
-function drawLayer(src){
-return new Promise(resolve=>{
-let img = new Image();
-img.src = src;
-img.onload = ()=>{
-ctx.drawImage(img,0,0,2000,2000);
-resolve();
-};
-img.onerror = ()=>resolve();
-});
-}
+/* ===== OTHER ===== */
 
 function download(){
-const link = document.createElement("a");
-link.href = canvas.toDataURL("image/png");
-link.download = "space-rider.png";
-link.click();
-}
-
-function saveMobile(){
-download();
+let a=document.createElement("a");
+a.href=canvas.toDataURL();
+a.download="rider.png";
+a.click();
 }
 
 function randomRider(){
-document.getElementById("nftInput").value =
-Math.floor(Math.random()*8888);
+document.getElementById("nftInput").value=Math.floor(Math.random()*8888);
 generate();
-}
-
-function shareTwitter(){
-const message =
-"LOOK! I tried @pinkerverse's tiny @SpaceRidersXYZ generator 🚀\n\n(Paste image here 👇)";
-window.open(
-"https://twitter.com/intent/tweet?text=" +
-encodeURIComponent(message),
-"_blank"
-);
 }
 
 </script>
