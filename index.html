@@ -77,15 +77,13 @@ box-shadow:0 0 20px rgba(34,211,238,0.25);
 
 .wallet{
 font-family:'JetBrains Mono', monospace;
-font-size:13px;
 background:rgba(255,255,255,0.05);
 padding:6px 8px;
 border-radius:6px;
 display:inline-block;
-margin-top:4px;
-word-break:break-all;
 }
 
+/* WRAPPER */
 .canvasWrapper{
 position:relative;
 margin-top:20px;
@@ -102,7 +100,6 @@ align-items:center;
 justify-content:center;
 background:#111827;
 border-radius:12px;
-font-size:14px;
 opacity:0.7;
 }
 
@@ -122,7 +119,7 @@ z-index:2;
 }
 
 #finalImage.active{
-transform:translateX(-50%) scale(1.02);
+transform:translateX(-50%) scale(1.015);
 box-shadow:0 0 40px rgba(34,211,238,0.35);
 }
 
@@ -150,7 +147,6 @@ border-radius:50%;
 width:40px;
 height:40px;
 animation:spin 1s linear infinite;
-margin-bottom:10px;
 }
 
 @keyframes spin{
@@ -158,6 +154,7 @@ margin-bottom:10px;
 100%{transform:rotate(360deg);}
 }
 
+/* TAP HINT */
 .tapHint{
 margin-top:10px;
 font-size:12px;
@@ -176,11 +173,6 @@ animation:fadeHint 2s ease;
 
 canvas{display:none;}
 
-@media (max-width: 600px){
-.container{padding:18px;}
-button{width:100%;margin:6px 0;font-size:14px;}
-}
-
 </style>
 
 </head>
@@ -191,9 +183,9 @@ button{width:100%;margin:6px 0;font-size:14px;}
 
 <h1>🚀 Space Riders Generator</h1>
 
-<p>Enter NFT ID or OpenSea link</p>
+<p>Enter NFT ID</p>
 
-<input id="nftInput" placeholder="4236 or OpenSea link">
+<input id="nftInput">
 
 <br>
 
@@ -204,30 +196,54 @@ button{width:100%;margin:6px 0;font-size:14px;}
 
 <h3>Create Your Own Rider</h3>
 
-<select id="background"><option value="">Background</option></select>
-<select id="body"><option value="">Body</option></select>
-<select id="head"><option value="">Head</option></select>
-<select id="eyes"><option value="">Eyes</option></select>
-<select id="mouth"><option value="">Mouth</option></select>
-<select id="hat"><option value="">Hat</option></select>
-<select id="glasses"><option value="">Glasses</option></select>
+<select id="background">
+<option value="">Background</option>
+<option value="blue">Blue</option>
+<option value="red">Red</option>
+</select>
+
+<select id="body">
+<option value="">Body</option>
+<option value="sr_blue_suit_v2">Blue Suit</option>
+<option value="sr_red_suit">Red Suit</option>
+</select>
+
+<select id="head">
+<option value="">Head</option>
+<option value="blue">Blue</option>
+<option value="green">Green</option>
+</select>
+
+<select id="eyes">
+<option value="">Eyes</option>
+<option value="normal">Normal</option>
+<option value="happy">Happy</option>
+</select>
+
+<select id="mouth">
+<option value="">Mouth</option>
+<option value="smile">Smile</option>
+<option value="smirk">Smirk</option>
+</select>
+
+<select id="hat">
+<option value="">Hat</option>
+<option value="blue_cap">Blue Cap</option>
+<option value="crown">Crown</option>
+</select>
+
+<select id="glasses">
+<option value="">Glasses</option>
+<option value="regular">Regular</option>
+<option value="vr">VR</option>
+</select>
 
 <br>
 
 <button onclick="generateCustom()">Create Rider</button>
 
 <div class="donation">
-<b>❤️ Enjoying this generator?</b><br>
-If you like it, consider supporting 💙<br><br>
-
-<b>ENS:</b><br>
-<div class="wallet">pinkerverse.eth</div><br>
-
-<b>ETH:</b><br>
-<div class="wallet">0x75f8571F4Ca2f00321cdc2FA469019c0f185E798</div><br>
-
-<b>SOL:</b><br>
-<div class="wallet">BVSLNBZirqL1RWy724JeBFoa9wqgjuNwBdQKUxAjG1Tr</div>
+Support: pinkerverse.eth
 </div>
 
 <div class="canvasWrapper">
@@ -240,7 +256,6 @@ Your Space Rider will appear here 🚀
 
 <div id="loading" class="loading">
 <div class="spinner"></div>
-Generating your Space Rider...
 </div>
 
 </div>
@@ -252,37 +267,27 @@ Generating your Space Rider...
 <br>
 
 <button onclick="download()">Download</button>
-<button onclick="saveMobile()">Save Image (Mobile)</button>
-<button onclick="shareTwitter()">Share on X</button>
 
 </div>
 
 <script>
 
-const canvas = document.createElement("canvas");
-canvas.width = 2000;
-canvas.height = 2000;
-const ctx = canvas.getContext("2d");
+const canvas=document.createElement("canvas");
+canvas.width=2000;
+canvas.height=2000;
+const ctx=canvas.getContext("2d");
 
-const loading = document.getElementById("loading");
-const finalImage = document.getElementById("finalImage");
-const hint = document.getElementById("hint");
-const genBtn = document.getElementById("genBtn");
+const loading=document.getElementById("loading");
+const finalImage=document.getElementById("finalImage");
+const hint=document.getElementById("hint");
+const genBtn=document.getElementById("genBtn");
 
-const BASE_URL = "https://ipfs.io/ipfs/Qma8e3QrAWVg4buufjUyLjFbjWJ7PKKNzehAct7kxgDFT6/";
+const BASE="https://ipfs.io/ipfs/Qma8e3QrAWVg4buufjUyLjFbjWJ7PKKNzehAct7kxgDFT6/";
 
-const order = ["background","shadow","body","head","cheeks","eyes","mouth","hat","glasses","space shine"];
-
-function extractID(input){
-if(input.includes("opensea")){
-let parts=input.split("/");
-return parts[parts.length-1];
-}
-return input;
-}
+const order=["background","shadow","body","head","cheeks","eyes","mouth","hat","glasses","space shine"];
 
 function cleanName(str){
-if(str==="^") return "caret";
+if(str==="^")return"caret";
 return str.toLowerCase().replace(/ /g,"_").replace(/[^a-z0-9_]/g,"");
 }
 
@@ -294,9 +299,9 @@ finalImage.style.display="none";
 finalImage.style.opacity=0;
 finalImage.classList.remove("active");
 
-const id=extractID(document.getElementById("nftInput").value);
+const id=document.getElementById("nftInput").value;
 
-const res=await fetch(BASE_URL+id+".json");
+const res=await fetch(BASE+id+".json");
 const data=await res.json();
 
 ctx.clearRect(0,0,2000,2000);
@@ -307,6 +312,7 @@ if(layer==="shadow"){await draw("traits/shadow/default.png");continue;}
 if(layer==="cheeks"){await draw("traits/cheeks/default.png");continue;}
 
 const trait=data.attributes.find(t=>t.trait_type.toLowerCase()===layer);
+
 if(trait){
 await draw("traits/"+cleanName(layer)+"/"+cleanName(trait.value)+".png");
 }
@@ -377,16 +383,9 @@ link.download="space-rider.png";
 link.click();
 }
 
-function saveMobile(){download();}
-
 function randomRider(){
 document.getElementById("nftInput").value=Math.floor(Math.random()*8888);
 generate();
-}
-
-function shareTwitter(){
-const msg="LOOK! I tried @pinkerverse's tiny @SpaceRidersXYZ generator 🚀\n\n(Paste image here 👇)";
-window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent(msg));
 }
 
 </script>
