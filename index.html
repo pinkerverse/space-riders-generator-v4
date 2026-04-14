@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
 <meta charset="UTF-8">
 <title>Space Riders Tiny Generator</title>
@@ -218,8 +216,6 @@ Your Space Rider will appear here 🚀
 <br>
 
 <button onclick="download()">Download</button>
-<button onclick="removeBackground()">Remove Background</button>
-<button onclick="addSpecialBackground()">Add Special Background</button>
 
 <div class="wallet">
 Support: pinkerverse.eth
@@ -435,104 +431,6 @@ document.getElementById("nftInput").value=Math.floor(Math.random()*8888);
 generate();
 }
 
-/* ========================= */
-/* 🔍 SEARCHABLE DROPDOWNS   */
-/* ========================= */
-
-window.addEventListener("load", () => {
-["background","body","head","eyes","mouth","hat","glasses","space_shine"]
-.forEach(id=>{
-if(document.getElementById(id)){
-new Choices("#"+id,{
-searchEnabled:true,
-itemSelectText:"",
-shouldSort:false
-});
-}
-});
-});
-
-/* ========================= */
-/* 💾 STORE ORIGINAL IMAGE   */
-/* ========================= */
-
-let lastImageData = null;
-
-const __finish = finish;
-finish = function(){
-__finish();
-try{
-lastImageData = ctx.getImageData(0,0,canvas.width,canvas.height);
-}catch(e){}
-};
-
-/* ========================= */
-/* 🧼 REMOVE BACKGROUND      */
-/* ========================= */
-
-function removeBackground(){
-
-if(!lastImageData) return;
-
-let data = new ImageData(
-new Uint8ClampedArray(lastImageData.data),
-lastImageData.width,
-lastImageData.height
-);
-
-for(let i=0;i<data.data.length;i+=4){
-
-let r=data.data[i];
-let g=data.data[i+1];
-let b=data.data[i+2];
-
-if(r<20 && g<20 && b<20){
-data.data[i+3]=0;
-}
-
-}
-
-ctx.putImageData(data,0,0);
-img.src = canvas.toDataURL();
-
-};
-
-/* ========================= */
-/* 🌌 SPECIAL BACKGROUNDS    */
-/* ========================= */
-
-const SPECIAL_BACKGROUNDS = [
-"trippy_1","space_ship_2","metallic_rider","trippy_2","trippy_3",
-"riders_gonna_ride","planet_1","planet_2","dark_space","beach",
-"jungle","squid_game","sky","void","solarflare","spaceship_11",
-"grey","starry_night","beach_2","rainbow"
-];
-
-function getRandomSpecialBG(){
-return SPECIAL_BACKGROUNDS[
-Math.floor(Math.random()*SPECIAL_BACKGROUNDS.length)
-];
-}
-
-function addSpecialBackground(){
-
-if(!lastImageData) return;
-
-ctx.putImageData(lastImageData,0,0);
-
-let rider = ctx.getImageData(0,0,canvas.width,canvas.height);
-
-let bg = new Image();
-bg.src = "traits/special_backgrounds/" + getRandomSpecialBG() + ".png";
-
-bg.onload = () => {
-ctx.drawImage(bg,0,0,2000,2000);
-ctx.putImageData(rider,0,0);
-img.src = canvas.toDataURL();
-};
-
-}
-  
 </script>
 
 </body>
