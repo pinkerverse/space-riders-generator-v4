@@ -217,6 +217,13 @@ Your Space Rider will appear here 🚀
 
 <button onclick="download()">Download</button>
 <button onclick="toggleBackground()">Toggle Background</button>
+<br><br>
+
+<select id="special_bg_select">
+<option value="">Select Special Background</option>
+</select>
+
+<button onclick="applySpecialBackground()">Apply Special Background</button>
 
 <div class="wallet">
 Support: pinkerverse.eth
@@ -299,6 +306,13 @@ hat:[
 glasses:["monocle","regular","rocketman","vr","vb","gradient"],
 
 space_shine:["black","white"]
+
+const SPECIAL_BACKGROUNDS = [
+"trippy_1","space_ship_2","metallic_rider","trippy_2","trippy_3",
+"riders_gonna_ride","planet_1","planet_2","dark_space","beach",
+"jungle","squid_game","sky","void","solarflare","spaceship_11",
+"grey","starry_night","beach_2","rainbow"
+];
 
 };
 
@@ -486,6 +500,89 @@ else if(window.lastBuilderState){
 for(const l of order){
 
 if(l==="background" && !window.bgVisible) continue;
+
+if(l==="shadow"){
+await draw("traits/shadow/default.png");
+continue;
+}
+
+if(l==="cheeks"){
+await draw("traits/cheeks/default.png");
+continue;
+}
+
+const v = window.lastBuilderState[l];
+
+if(v){
+await draw("traits/"+l+"/"+v+".png");
+}
+
+}
+
+}
+
+img.src = canvas.toDataURL();
+
+}
+
+window.addEventListener("load", () => {
+
+const select = document.getElementById("special_bg_select");
+
+SPECIAL_BACKGROUNDS.forEach(bg=>{
+const option = document.createElement("option");
+option.value = bg;
+option.textContent = bg.replace(/_/g," ");
+select.appendChild(option);
+});
+
+});
+
+async function applySpecialBackground(){
+
+const selected = document.getElementById("special_bg_select").value;
+if(!selected) return;
+
+ctx.clearRect(0,0,2000,2000);
+
+/* draw selected background */
+await draw("traits/special_backgrounds/" + selected + ".png");
+
+/* ===== NFT MODE ===== */
+if(window.lastNFTData){
+
+for(const l of order){
+
+if(l==="background") continue;
+
+if(l==="shadow"){
+await draw("traits/shadow/default.png");
+continue;
+}
+
+if(l==="cheeks"){
+await draw("traits/cheeks/default.png");
+continue;
+}
+
+const t = window.lastNFTData.attributes.find(
+a => a.trait_type.toLowerCase().replace(/ /g,"_") === l
+);
+
+if(t){
+await draw("traits/"+l+"/"+clean(t.value)+".png");
+}
+
+}
+
+}
+
+/* ===== BUILDER MODE ===== */
+else if(window.lastBuilderState){
+
+for(const l of order){
+
+if(l==="background") continue;
 
 if(l==="shadow"){
 await draw("traits/shadow/default.png");
