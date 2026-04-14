@@ -216,6 +216,7 @@ Your Space Rider will appear here 🚀
 <br>
 
 <button onclick="download()">Download</button>
+<button onclick="toggleBackground()">Toggle Background</button>
 
 <div class="wallet">
 Support: pinkerverse.eth
@@ -354,6 +355,9 @@ load.style.display="flex";
 const id=document.getElementById("nftInput").value;
 const res=await fetch(BASE+id+".json");
 const data=await res.json();
+window.lastNFTData = data;
+window.lastBuilderState = null;
+window.bgVisible = true;
 
 ctx.clearRect(0,0,2000,2000);
 
@@ -378,6 +382,14 @@ finish();
 /* ===== BUILDER ===== */
 
 async function generateCustom(){
+
+window.lastBuilderState = {};
+window.lastNFTData = null;
+window.bgVisible = true;
+
+for(const l of order){
+window.lastBuilderState[l] = document.getElementById(l)?.value;
+}
 
 load.style.display="flex";
 ctx.clearRect(0,0,2000,2000);
@@ -431,6 +443,74 @@ document.getElementById("nftInput").value=Math.floor(Math.random()*8888);
 generate();
 }
 
+async function toggleBackground(){
+
+if(window.bgVisible === undefined) return;
+
+window.bgVisible = !window.bgVisible;
+
+ctx.clearRect(0,0,2000,2000);
+
+/* ===== NFT MODE ===== */
+if(window.lastNFTData){
+
+for(const l of order){
+
+if(l==="background" && !window.bgVisible) continue;
+
+if(l==="shadow"){
+await draw("traits/shadow/default.png");
+continue;
+}
+
+if(l==="cheeks"){
+await draw("traits/cheeks/default.png");
+continue;
+}
+
+const t = window.lastNFTData.attributes.find(
+a => a.trait_type.toLowerCase().replace(/ /g,"_") === l
+);
+
+if(t){
+await draw("traits/"+l+"/"+clean(t.value)+".png");
+}
+
+}
+
+}
+
+/* ===== BUILDER MODE ===== */
+else if(window.lastBuilderState){
+
+for(const l of order){
+
+if(l==="background" && !window.bgVisible) continue;
+
+if(l==="shadow"){
+await draw("traits/shadow/default.png");
+continue;
+}
+
+if(l==="cheeks"){
+await draw("traits/cheeks/default.png");
+continue;
+}
+
+const v = window.lastBuilderState[l];
+
+if(v){
+await draw("traits/"+l+"/"+v+".png");
+}
+
+}
+
+}
+
+img.src = canvas.toDataURL();
+
+}
+  
 </script>
 
 </body>
