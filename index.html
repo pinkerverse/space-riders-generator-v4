@@ -394,6 +394,7 @@ const BASE="https://ipfs.io/ipfs/Qma8e3QrAWVg4buufjUyLjFbjWJ7PKKNzehAct7kxgDFT6/
 const order=["background","shadow","body","head","cheeks","eyes","mouth","hat","glasses","space_shine"];
 
 window.currentOverlay = null;
+window.currentSpecialBG = null;
 
 function clean(str){
 if(str==="^") return "caret";
@@ -602,6 +603,7 @@ overlaySelect.appendChild(option);
 async function applySpecialBackground(){
 
 const selected = document.getElementById("special_bg_select").value;
+window.currentSpecialBG = selected;
 if(!selected) return;
 
 ctx.clearRect(0,0,2000,2000);
@@ -689,9 +691,51 @@ ctx.clearRect(0,0,2000,2000);
 /* ===== NFT MODE ===== */
 if(window.lastNFTData){
 
+/* ===== USE SPECIAL BACKGROUND IF SELECTED ===== */
+if(window.currentSpecialBG){
+await draw("traits/special_backgrounds/" + window.currentSpecialBG + ".png");
+} else {
+
 for(const l of order){
 
 if(l==="background" && !window.bgVisible) continue;
+
+const t = window.lastNFTData.attributes.find(
+a => a.trait_type.toLowerCase().replace(/ /g,"_") === l
+);
+
+if(t && l==="background"){
+await draw("traits/"+l+"/"+clean(t.value)+".png");
+}
+
+}
+
+}
+
+/* ===== CONTINUE NORMAL DRAW ===== */
+for(const l of order){
+
+if(l==="background") continue;
+
+if(l==="shadow"){
+await draw("traits/shadow/default.png");
+continue;
+}
+
+if(l==="cheeks"){
+await draw("traits/cheeks/default.png");
+continue;
+}
+
+const t = window.lastNFTData.attributes.find(
+a => a.trait_type.toLowerCase().replace(/ /g,"_") === l
+);
+
+if(t){
+await draw("traits/"+l+"/"+clean(t.value)+".png");
+}
+
+}
 
 if(l==="shadow"){
 await draw("traits/shadow/default.png");
