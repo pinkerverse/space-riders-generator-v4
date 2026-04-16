@@ -420,13 +420,12 @@ load.style.display="flex";
 const id=document.getElementById("nftInput").value;
 const res=await fetch(BASE+id+".json");
 const data=await res.json();
+
 window.lastNFTData = data;
 window.lastBuilderState = null;
 window.bgVisible = true;
 
-ctx.clearRect(0,0,2000,2000);
-
-for(const l of order){
+await redrawWithOverlay();
 
 finish();
 }
@@ -666,51 +665,26 @@ ctx.clearRect(0,0,2000,2000);
 /* ===== NFT MODE ===== */
 if(window.lastNFTData){
 
-/* ===== USE SPECIAL BACKGROUND IF SELECTED ===== */
+/* background */
 if(window.currentSpecialBG){
 await draw("traits/special_backgrounds/" + window.currentSpecialBG + ".png");
-} else {
-
-for(const l of order){
-
-if(l==="background" && !window.bgVisible) continue;
+} 
+else if(window.bgVisible){
 
 const t = window.lastNFTData.attributes.find(
-a => a.trait_type.toLowerCase().replace(/ /g,"_") === l
-);
-
-if(t && l==="background"){
-await draw("traits/"+l+"/"+clean(t.value)+".png");
-}
-
-}
-
-}
-
-/* ===== CONTINUE NORMAL DRAW ===== */
-for(const l of order){
-
-if(l==="background") continue;
-
-if(l==="shadow"){
-await draw("traits/shadow/default.png");
-continue;
-}
-
-if(l==="cheeks"){
-await draw("traits/cheeks/default.png");
-continue;
-}
-
-const t = window.lastNFTData.attributes.find(
-a => a.trait_type.toLowerCase().replace(/ /g,"_") === l
+a => a.trait_type.toLowerCase().replace(/ /g,"_") === "background"
 );
 
 if(t){
-await draw("traits/"+l+"/"+clean(t.value)+".png");
+await draw("traits/background/"+clean(t.value)+".png");
 }
 
 }
+
+/* rest */
+for(const l of order){
+
+if(l==="background") continue;
 
 if(l==="shadow"){
 await draw("traits/shadow/default.png");
@@ -737,9 +711,24 @@ await draw("traits/"+l+"/"+clean(t.value)+".png");
 /* ===== BUILDER MODE ===== */
 else if(window.lastBuilderState){
 
+/* background */
+if(window.currentSpecialBG){
+await draw("traits/special_backgrounds/" + window.currentSpecialBG + ".png");
+} 
+else if(window.bgVisible){
+
+const v = window.lastBuilderState["background"];
+
+if(v){
+await draw("traits/background/"+v+".png");
+}
+
+}
+
+/* rest */
 for(const l of order){
 
-if(l==="background" && !window.bgVisible) continue;
+if(l==="background") continue;
 
 if(l==="shadow"){
 await draw("traits/shadow/default.png");
@@ -761,7 +750,7 @@ await draw("traits/"+l+"/"+v+".png");
 
 }
 
-/* ===== OVERLAY (TOP LAYER) ===== */
+/* ===== OVERLAY ===== */
 if(window.currentOverlay){
 await draw("traits/overlays/" + window.currentOverlay + ".png");
 }
