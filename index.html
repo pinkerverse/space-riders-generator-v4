@@ -461,17 +461,6 @@ ctx.clearRect(0,0,2000,2000);
 
 for(const l of order){
 
-if(l==="shadow"){await draw("traits/shadow/default.png");continue;}
-if(l==="cheeks"){await draw("traits/cheeks/default.png");continue;}
-
-const v=document.getElementById(l)?.value;
-
-if(v){
-await draw("traits/"+l+"/"+v+".png");
-}
-
-}
-
 finish();
 }
 
