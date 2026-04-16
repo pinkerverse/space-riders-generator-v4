@@ -428,19 +428,6 @@ ctx.clearRect(0,0,2000,2000);
 
 for(const l of order){
 
-if(l==="shadow"){await draw("traits/shadow/default.png");continue;}
-if(l==="cheeks"){await draw("traits/cheeks/default.png");continue;}
-
-const t = data.attributes.find(
-a => a.trait_type.toLowerCase().replace(/ /g,"_") === l
-);
-
-if(t){
-await draw("traits/"+l+"/"+clean(t.value)+".png");
-}
-
-}
-
 finish();
 }
 
@@ -457,9 +444,8 @@ window.lastBuilderState[l] = document.getElementById(l)?.value;
 }
 
 load.style.display="flex";
-ctx.clearRect(0,0,2000,2000);
 
-for(const l of order){
+await redrawWithOverlay();
 
 finish();
 }
