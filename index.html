@@ -258,6 +258,13 @@ Your Space Rider will appear here 🚀
 </select>
 
 <button onclick="applySpecialBackground()">Apply Special Background</button>
+<br><br>
+
+<select id="overlay_select">
+<option value="">Select Overlay</option>
+</select>
+
+<button onclick="applyOverlay()">Apply Overlay</button>
 
 <div class="wallet">
 Support: pinkerverse.eth
@@ -351,6 +358,12 @@ const SPECIAL_BACKGROUNDS = [
 "rider_special_blue","blue_void","ikuzo","rider_special_dark","green_void",
 ];
 
+const OVERLAYS = [
+"rainbow_morning_1",
+"rainbow_morning_2",
+"rider_morning"
+];
+
 /* populate dropdowns */
 for(const key in TRAITS){
 const select = document.getElementById(key);
@@ -379,6 +392,8 @@ const genBtn=document.getElementById("genBtn");
 const BASE="https://ipfs.io/ipfs/Qma8e3QrAWVg4buufjUyLjFbjWJ7PKKNzehAct7kxgDFT6/";
 
 const order=["background","shadow","body","head","cheeks","eyes","mouth","hat","glasses","space_shine"];
+
+window.currentOverlay = null;
 
 function clean(str){
 if(str==="^") return "caret";
@@ -556,12 +571,13 @@ await draw("traits/"+l+"/"+v+".png");
 
 }
 
-img.src = canvas.toDataURL();
+await redrawWithOverlay();
 
 }
 
 window.addEventListener("load", () => {
 
+/* ===== SPECIAL BACKGROUNDS ===== */
 const select = document.getElementById("special_bg_select");
 
 SPECIAL_BACKGROUNDS.forEach(bg=>{
@@ -569,6 +585,16 @@ const option = document.createElement("option");
 option.value = bg;
 option.textContent = bg.replace(/_/g," ");
 select.appendChild(option);
+});
+
+/* ===== OVERLAYS ===== */
+const overlaySelect = document.getElementById("overlay_select");
+
+OVERLAYS.forEach(o=>{
+const option = document.createElement("option");
+option.value = o;
+option.textContent = o.replace(/_/g," ");
+overlaySelect.appendChild(option);
 });
 
 });
@@ -637,6 +663,88 @@ await draw("traits/"+l+"/"+v+".png");
 
 }
 
+}
+
+if(window.currentOverlay){
+await draw("traits/overlays/" + window.currentOverlay + ".png");
+}
+img.src = canvas.toDataURL();
+
+}
+
+async function applyOverlay(){
+
+const selected = document.getElementById("overlay_select").value;
+
+window.currentOverlay = selected || null;
+
+await redrawWithOverlay();
+
+}
+
+async function redrawWithOverlay(){
+
+ctx.clearRect(0,0,2000,2000);
+
+/* ===== NFT MODE ===== */
+if(window.lastNFTData){
+
+for(const l of order){
+
+if(l==="background" && !window.bgVisible) continue;
+
+if(l==="shadow"){
+await draw("traits/shadow/default.png");
+continue;
+}
+
+if(l==="cheeks"){
+await draw("traits/cheeks/default.png");
+continue;
+}
+
+const t = window.lastNFTData.attributes.find(
+a => a.trait_type.toLowerCase().replace(/ /g,"_") === l
+);
+
+if(t){
+await draw("traits/"+l+"/"+clean(t.value)+".png");
+}
+
+}
+
+}
+
+/* ===== BUILDER MODE ===== */
+else if(window.lastBuilderState){
+
+for(const l of order){
+
+if(l==="background" && !window.bgVisible) continue;
+
+if(l==="shadow"){
+await draw("traits/shadow/default.png");
+continue;
+}
+
+if(l==="cheeks"){
+await draw("traits/cheeks/default.png");
+continue;
+}
+
+const v = window.lastBuilderState[l];
+
+if(v){
+await draw("traits/"+l+"/"+v+".png");
+}
+
+}
+
+}
+
+/* ===== OVERLAY (TOP LAYER) ===== */
+if(window.currentOverlay){
+await draw("traits/overlays/" + window.currentOverlay + ".png");
 }
 
 img.src = canvas.toDataURL();
