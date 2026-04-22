@@ -217,6 +217,7 @@ border-radius:8px;
 <h3>Create Your Own Rider</h3>
 
 <select id="background"></select>
+<select id="nhl"></select>
 <select id="body"></select>
 <select id="head"></select>
 <select id="eyes"></select>
@@ -348,6 +349,41 @@ glasses:["monocle","regular","rocketman","vr","vb","gradient"],
 
 space_shine:["black","white"]
 
+nhl:[
+"anaheim_ducks",
+"arizona_coyotes",
+"boston_bruins",
+"buffalo_sabres",
+"calgary_flames",
+"carolina_hurricanes",
+"chicago_blackhawks",
+"colorado_avalanche",
+"columbus_blue_jackets",
+"dallas_stars",
+"detroit_red_wings",
+"edmonton_oilers",
+"florida_panthers",
+"los_angeles_kings",
+"minnesota_wild",
+"montreal_canadiens",
+"nashville_predators",
+"new_jersey_devils",
+"new_york_islanders",
+"new_york_rangers",
+"ottawa_senators",
+"philadelphia_flyers",
+"pittsburgh_penguins",
+"san_jose_sharks",
+"seattle_kraken",
+"st_louis_blues",
+"tampa_bay_lightning",
+"toronto_maple_leafs",
+"vancouver_canucks",
+"vegas_golden_knights",
+"washington_capitals",
+"winnipeg_jets"
+],
+
 }; // ✅ correctly close TRAITS
   
 const SPECIAL_BACKGROUNDS = [
@@ -396,7 +432,8 @@ const order=["background","shadow","body","head","cheeks","eyes","mouth","hat","
 
 window.currentOverlay = null;
 window.currentSpecialBG = null;
-
+window.currentNHL = null;
+  
 function clean(str){
 if(str==="^") return "caret";
 return str.toLowerCase().replace(/ /g,"_").replace(/[^a-z0-9_]/g,"");
@@ -425,6 +462,7 @@ const data=await res.json();
 window.lastNFTData = data;
 window.lastBuilderState = null;
 window.bgVisible = true;
+window.currentNHL = null;
 
 await redrawWithOverlay();
 
@@ -442,6 +480,8 @@ window.bgVisible = true;
 for(const l of order){
 window.lastBuilderState[l] = document.getElementById(l)?.value;
 }
+
+window.currentNHL = document.getElementById("nhl")?.value || null;
 
 load.style.display="flex";
 
@@ -685,6 +725,20 @@ await draw("traits/background/"+clean(t.value)+".png");
 /* rest */
 for(const l of order){
 
+/* ===== NHL OVERRIDE ===== */
+if(window.currentNHL){
+
+// skip normal body + hat
+if(l === "body" || l === "hat") continue;
+
+// draw NHL instead
+if(l === "nhl"){
+await draw("traits/nhl/" + window.currentNHL + ".png");
+continue;
+}
+
+}
+
 if(l==="background") continue;
 
 if(l==="shadow"){
@@ -705,6 +759,18 @@ if(t){
 await draw("traits/"+l+"/"+clean(t.value)+".png");
 }
 
+}
+
+}
+
+/* ===== NHL OVERRIDE ===== */
+if(window.currentNHL){
+
+if(l === "body" || l === "hat") continue;
+
+if(l === "nhl"){
+await draw("traits/nhl/" + window.currentNHL + ".png");
+continue;
 }
 
 }
