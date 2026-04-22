@@ -647,6 +647,17 @@ if(window.lastNFTData){
 
 for(const l of order){
 
+if(window.currentNHL){
+
+if(l === "body" || l === "hat") continue;
+
+if(l === "nhl"){
+await draw("traits/nhl/" + window.currentNHL + ".png");
+continue;
+}
+
+}
+  
 if(l==="background") continue;
 
 if(l==="shadow"){
@@ -657,18 +668,6 @@ continue;
 if(l==="cheeks"){
 await draw("traits/cheeks/default.png");
 continue;
-}
-
-/* ===== NHL OVERRIDE ===== */
-if(window.currentNHL){
-
-if(l === "body" || l === "hat") continue;
-
-if(l === "nhl"){
-await draw("traits/nhl/" + window.currentNHL + ".png");
-continue;
-}
-
 }
 
 const t = window.lastNFTData.attributes.find(
@@ -762,18 +761,6 @@ await draw("traits/background/"+clean(t.value)+".png");
   
 /* rest */
 
-/* ===== NHL OVERRIDE ===== */
-if(window.currentNHL){
-
-if(l === "body" || l === "hat") continue;
-
-if(l === "nhl"){
-await draw("traits/nhl/" + window.currentNHL + ".png");
-continue;
-}
-
-}
-
 for(const l of order){
 
 
@@ -819,18 +806,6 @@ await draw("traits/background/"+v+".png");
 }
 
 /* rest */
-
-/* ===== NHL OVERRIDE ===== */
-if(window.currentNHL){
-
-if(l === "body" || l === "hat") continue;
-
-if(l === "nhl"){
-await draw("traits/nhl/" + window.currentNHL + ".png");
-continue;
-}
-
-}
 
 for(const l of order){
 
