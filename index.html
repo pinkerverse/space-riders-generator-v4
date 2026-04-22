@@ -561,18 +561,6 @@ await draw("traits/"+l+"/"+clean(t.value)+".png");
 }
 
 /* ===== BUILDER MODE ===== */
-
-/* ===== NHL OVERRIDE ===== */
-if(window.currentNHL){
-
-if(l === "body" || l === "hat") continue;
-
-if(l === "nhl"){
-await draw("traits/nhl/" + window.currentNHL + ".png");
-continue;
-}
-
-}
   
 else if(window.lastBuilderState){
 
@@ -759,18 +747,6 @@ if(t){
 await draw("traits/"+l+"/"+clean(t.value)+".png");
 }
 
-}
-
-}
-
-/* ===== NHL OVERRIDE ===== */
-if(window.currentNHL){
-
-if(l === "body" || l === "hat") continue;
-
-if(l === "nhl"){
-await draw("traits/nhl/" + window.currentNHL + ".png");
-continue;
 }
 
 }
