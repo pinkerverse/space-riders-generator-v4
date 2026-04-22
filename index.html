@@ -347,7 +347,7 @@ hat:[
 
 glasses:["monocle","regular","rocketman","vr","vb","gradient"],
 
-space_shine:["black","white"]
+space_shine:["black","white"],
 
 nhl:[
 "anaheim_ducks",
@@ -428,7 +428,7 @@ const genBtn=document.getElementById("genBtn");
 
 const BASE="https://ipfs.io/ipfs/Qma8e3QrAWVg4buufjUyLjFbjWJ7PKKNzehAct7kxgDFT6/";
 
-const order=["background","shadow","body","head","cheeks","eyes","mouth","hat","glasses","space_shine"];
+const order=["background","shadow","nhl","body","head","cheeks","eyes","mouth","hat","glasses","space_shine"];
 
 window.currentOverlay = null;
 window.currentSpecialBG = null;
@@ -725,19 +725,6 @@ await draw("traits/background/"+clean(t.value)+".png");
 /* rest */
 for(const l of order){
 
-/* ===== NHL OVERRIDE ===== */
-if(window.currentNHL){
-
-// skip normal body + hat
-if(l === "body" || l === "hat") continue;
-
-// draw NHL instead
-if(l === "nhl"){
-await draw("traits/nhl/" + window.currentNHL + ".png");
-continue;
-}
-
-}
 
 if(l==="background") continue;
 
