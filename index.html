@@ -217,7 +217,6 @@ border-radius:8px;
 <h3>Create Your Own Rider</h3>
 
 <select id="background"></select>
-<select id="nhl"></select>
 <select id="body"></select>
 <select id="head"></select>
 <select id="eyes"></select>
@@ -266,6 +265,14 @@ Your Space Rider will appear here 🚀
 </select>
 
 <button onclick="applyOverlay()">Apply Overlay</button>
+
+<br><br>
+
+<select id="nhl_select">
+<option value="">Select NHL Team</option>
+</select>
+
+<button onclick="applyNHL()">Apply Team</button>
 
 <div class="wallet">
 Support: pinkerverse.eth
@@ -481,8 +488,6 @@ for(const l of order){
 window.lastBuilderState[l] = document.getElementById(l)?.value;
 }
 
-window.currentNHL = document.getElementById("nhl")?.value || null;
-
 load.style.display="flex";
 
 await redrawWithOverlay();
@@ -530,6 +535,16 @@ if(window.bgVisible === undefined) return;
 window.bgVisible = !window.bgVisible;
 
 ctx.clearRect(0,0,2000,2000);
+
+async function applyNHL(){
+
+const selected = document.getElementById("nhl_select").value;
+
+window.currentNHL = selected || null;
+
+await redrawWithOverlay();
+
+}
 
 /* ===== NFT MODE ===== */
 if(window.lastNFTData){
@@ -614,6 +629,16 @@ option.textContent = o.replace(/_/g," ");
 overlaySelect.appendChild(option);
 });
 
+/* ===== NHL ===== */
+const nhlSelect = document.getElementById("nhl_select");
+
+TRAITS.nhl.forEach(team=>{
+const option = document.createElement("option");
+option.value = team;
+option.textContent = team.replace(/_/g," ");
+nhlSelect.appendChild(option);
+});
+
 });
 
 async function applySpecialBackground(){
@@ -642,6 +667,18 @@ continue;
 if(l==="cheeks"){
 await draw("traits/cheeks/default.png");
 continue;
+}
+
+/* ===== NHL OVERRIDE ===== */
+if(window.currentNHL){
+
+if(l === "body" || l === "hat") continue;
+
+if(l === "nhl"){
+await draw("traits/nhl/" + window.currentNHL + ".png");
+continue;
+}
+
 }
 
 const t = window.lastNFTData.attributes.find(
