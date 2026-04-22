@@ -534,13 +534,8 @@ if(window.bgVisible === undefined) return;
 
 window.bgVisible = !window.bgVisible;
 
-ctx.clearRect(0,0,2000,2000);
+await redrawWithOverlay();
 
-if(l==="background" && !window.bgVisible) continue;
-
-if(l==="shadow"){
-await draw("traits/shadow/default.png");
-continue;
 }
 
 if(l==="cheeks"){
@@ -653,16 +648,17 @@ if(window.lastNFTData){
 
 for(const l of order){
 
+/* ===== NHL OVERRIDE ===== */
 if(window.currentNHL){
 
-    if(l === "body" || l === "hat") continue;
+if(l === "body" || l === "hat") continue;
 
-    if(l === "nhl"){
-      await draw("traits/nhl/" + window.currentNHL + ".png");
-      continue;
-    }
+if(l === "nhl"){
+await draw("traits/nhl/" + window.currentNHL + ".png");
+continue;
+}
 
-  }
+}
   
 if(l==="background") continue;
 
@@ -693,16 +689,17 @@ else if(window.lastBuilderState){
 
 for(const l of order){
 
-  if(window.currentNHL){
+/* ===== NHL OVERRIDE ===== */
+if(window.currentNHL){
 
-    if(l === "body" || l === "hat") continue;
+if(l === "body" || l === "hat") continue;
 
-    if(l === "nhl"){
-      await draw("traits/nhl/" + window.currentNHL + ".png");
-      continue;
-    }
+if(l === "nhl"){
+await draw("traits/nhl/" + window.currentNHL + ".png");
+continue;
+}
 
-  }
+}
 
 if(l==="background") continue;
 
@@ -779,7 +776,6 @@ await draw("traits/background/"+clean(t.value)+".png");
 /* rest */
 
 for(const l of order){
-
 
 if(l==="background") continue;
 
