@@ -536,16 +536,6 @@ window.bgVisible = !window.bgVisible;
 
 ctx.clearRect(0,0,2000,2000);
 
-async function applyNHL(){
-
-const selected = document.getElementById("nhl_select").value;
-
-window.currentNHL = selected || null;
-
-await redrawWithOverlay();
-
-}
-
 /* ===== NFT MODE ===== */
 if(window.lastNFTData){
 
@@ -729,6 +719,16 @@ img.src = canvas.toDataURL();
 
 async function applyOverlay(){
 
+async function applyNHL(){
+
+const selected = document.getElementById("nhl_select").value;
+
+window.currentNHL = selected || null;
+
+await redrawWithOverlay();
+
+}
+
 const selected = document.getElementById("overlay_select").value;
 
 window.currentOverlay = selected || null;
@@ -760,6 +760,18 @@ await draw("traits/background/"+clean(t.value)+".png");
 
 }
 
+/* ===== NHL OVERRIDE ===== */
+if(window.currentNHL){
+
+if(l === "body" || l === "hat") continue;
+
+if(l === "nhl"){
+await draw("traits/nhl/" + window.currentNHL + ".png");
+continue;
+}
+
+}
+  
 /* rest */
 for(const l of order){
 
