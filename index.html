@@ -541,6 +541,17 @@ if(window.lastNFTData){
 
 for(const l of order){
 
+if(window.currentNHL){
+
+    if(l === "body" || l === "hat") continue;
+
+    if(l === "nhl"){
+      await draw("traits/nhl/" + window.currentNHL + ".png");
+      continue;
+    }
+
+  }
+
 if(l==="background" && !window.bgVisible) continue;
 
 if(l==="shadow"){
@@ -570,6 +581,17 @@ await draw("traits/"+l+"/"+clean(t.value)+".png");
 else if(window.lastBuilderState){
 
 for(const l of order){
+
+  if(window.currentNHL){
+
+    if(l === "body" || l === "hat") continue;
+
+    if(l === "nhl"){
+      await draw("traits/nhl/" + window.currentNHL + ".png");
+      continue;
+    }
+
+  }
 
 if(l==="background" && !window.bgVisible) continue;
 
@@ -646,17 +668,6 @@ await draw("traits/special_backgrounds/" + selected + ".png");
 if(window.lastNFTData){
 
 for(const l of order){
-
-if(window.currentNHL){
-
-if(l === "body" || l === "hat") continue;
-
-if(l === "nhl"){
-await draw("traits/nhl/" + window.currentNHL + ".png");
-continue;
-}
-
-}
   
 if(l==="background") continue;
 
