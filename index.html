@@ -719,19 +719,19 @@ img.src = canvas.toDataURL();
 
 async function applyOverlay(){
 
-async function applyNHL(){
+const selected = document.getElementById("overlay_select").value;
 
-const selected = document.getElementById("nhl_select").value;
-
-window.currentNHL = selected || null;
+window.currentOverlay = selected || null;
 
 await redrawWithOverlay();
 
 }
 
-const selected = document.getElementById("overlay_select").value;
+async function applyNHL(){
 
-window.currentOverlay = selected || null;
+const selected = document.getElementById("nhl_select").value;
+
+window.currentNHL = selected || null;
 
 await redrawWithOverlay();
 
@@ -759,6 +759,8 @@ await draw("traits/background/"+clean(t.value)+".png");
 }
 
 }
+  
+/* rest */
 
 /* ===== NHL OVERRIDE ===== */
 if(window.currentNHL){
@@ -771,8 +773,7 @@ continue;
 }
 
 }
-  
-/* rest */
+
 for(const l of order){
 
 
@@ -818,6 +819,19 @@ await draw("traits/background/"+v+".png");
 }
 
 /* rest */
+
+/* ===== NHL OVERRIDE ===== */
+if(window.currentNHL){
+
+if(l === "body" || l === "hat") continue;
+
+if(l === "nhl"){
+await draw("traits/nhl/" + window.currentNHL + ".png");
+continue;
+}
+
+}
+
 for(const l of order){
 
 if(l==="background") continue;
