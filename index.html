@@ -632,13 +632,26 @@ nhlSelect.appendChild(option);
 async function applySpecialBackground(){
 
 const selected = document.getElementById("special_bg_select").value;
-window.currentSpecialBG = selected;
-if(!selected) return;
 
-ctx.clearRect(0,0,2000,2000);
+// store selection globally
+window.currentSpecialBG = selected || null;
 
-/* draw selected background */
-await draw("traits/special_backgrounds/" + selected + ".png");
+// if nothing selected → just redraw normally
+if(!selected){
+  await redrawWithOverlay();
+  return;
+}
+
+// show loading (optional but nice)
+load.style.display = "flex";
+
+// 🚀 DO NOT manually build full image
+// just call the main renderer
+await redrawWithOverlay();
+
+load.style.display = "none";
+
+}
 
 /* ===== NFT MODE ===== */
 if(window.lastNFTData){
