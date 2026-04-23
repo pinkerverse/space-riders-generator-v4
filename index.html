@@ -540,6 +540,12 @@ if(window.lastNFTData){
 
 for(const l of order){
 
+// 🚀 ADD THIS LINE
+if(l === "glasses") continue;
+
+// skip original body + hat when NHL is active
+if(window.currentNHL && (l === "body" || l === "hat")) continue;
+
 if(l==="background" && !window.bgVisible) continue;
 
 if(l==="shadow"){
@@ -568,6 +574,12 @@ await draw("traits/"+l+"/"+clean(t.value)+".png");
 else if(window.lastBuilderState){
 
 for(const l of order){
+
+// 🚀 ADD THIS LINE
+if(l === "glasses") continue;
+
+// skip original body + hat when NHL is active
+if(window.currentNHL && (l === "body" || l === "hat")) continue;
   
 if(l==="background" && !window.bgVisible) continue;
 
@@ -645,6 +657,12 @@ if(window.lastNFTData){
 
 for(const l of order){
 
+// 🚀 ADD THIS LINE
+if(l === "glasses") continue;
+
+// skip original body + hat when NHL is active
+if(window.currentNHL && (l === "body" || l === "hat")) continue;
+
 if(l==="background") continue;
 
 if(l==="shadow"){
@@ -673,6 +691,8 @@ await draw("traits/"+l+"/"+clean(t.value)+".png");
 else if(window.lastBuilderState){
 
 for(const l of order){
+
+if(l === "glasses") continue;
 
 // skip original body + hat when NHL is active
 if(window.currentNHL && (l === "body" || l === "hat")) continue;
@@ -832,6 +852,28 @@ await draw("traits/overlays/" + window.currentOverlay + ".png");
 /* ===== NHL ===== */
 if(window.currentNHL){
 await draw("traits/nhl/" + window.currentNHL + ".png");
+}
+
+/* ===== GLASSES (TOP LAYER) ===== */
+
+// NFT mode
+if(window.lastNFTData){
+  const t = window.lastNFTData.attributes.find(
+    a => a.trait_type.toLowerCase().replace(/ /g,"_") === "glasses"
+  );
+
+  if(t){
+    await draw("traits/glasses/" + clean(t.value) + ".png");
+  }
+}
+
+// Builder mode
+else if(window.lastBuilderState){
+  const v = window.lastBuilderState["glasses"];
+
+  if(v){
+    await draw("traits/glasses/" + v + ".png");
+  }
 }
 
 /* ===== SPACE SHINE ON TOP (ONLY IF NHL ACTIVE) ===== */
