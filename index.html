@@ -266,6 +266,14 @@ Your Space Rider will appear here 🚀
 
 <button onclick="applyOverlay()">Apply Overlay</button>
 
+  <br><br>
+
+<select id="nhl_select">
+<option value="">Select NHL Team</option>
+</select>
+
+<button onclick="applyNHL()">Apply NHL Team</button>
+
 <div class="wallet">
 Support: pinkerverse.eth
 </div>
@@ -365,6 +373,41 @@ const OVERLAYS = [
 
 ];
 
+const NHL_TEAMS = [
+"anaheim_ducks",
+"arizona_coyotes",
+"boston_bruins",
+"buffalo_sabres",
+"calgary_flames",
+"carolina_hurricanes",
+"chicago_blackhawks",
+"colorado_avalanche",
+"columbus_blue_jackets",
+"dallas_stars",
+"detroit_red_wings",
+"edmonton_oilers",
+"florida_panthers",
+"los_angeles_kings",
+"minnesota_wild",
+"montreal_canadiens",
+"nashville_predators",
+"new_jersey_devils",
+"new_york_islanders",
+"new_york_rangers",
+"ottawa_senators",
+"philadelphia_flyers",
+"pittsburgh_penguins",
+"san_jose_sharks",
+"seattle_kraken",
+"st_louis_blues",
+"tampa_bay_lightning",
+"toronto_maple_leafs",
+"vancouver_canucks",
+"vegas_golden_knights",
+"washington_capitals",
+"winnipeg_jets"
+];
+
 /* populate dropdowns */
 for(const key in TRAITS){
 const select = document.getElementById(key);
@@ -396,6 +439,7 @@ const order=["background","shadow","body","head","cheeks","eyes","mouth","hat","
 
 window.currentOverlay = null;
 window.currentSpecialBG = null;
+window.currentNHL = null;
 
 function clean(str){
 if(str==="^") return "caret";
@@ -573,6 +617,16 @@ option.textContent = o.replace(/_/g," ");
 overlaySelect.appendChild(option);
 });
 
+/* ===== NHL ===== */
+const nhlSelect = document.getElementById("nhl_select");
+
+NHL_TEAMS.forEach(team=>{
+const option = document.createElement("option");
+option.value = team;
+option.textContent = team.replace(/_/g," ");
+nhlSelect.appendChild(option);
+});
+
 });
 
 async function applySpecialBackground(){
@@ -590,6 +644,18 @@ await draw("traits/special_backgrounds/" + selected + ".png");
 if(window.lastNFTData){
 
 for(const l of order){
+
+  /* ===== NHL OVERRIDE ===== */
+if(window.currentNHL){
+
+  if(l === "body" || l === "hat") continue;
+
+  if(l === "body"){
+    await draw("traits/nhl/" + window.currentNHL + ".png");
+    continue;
+  }
+
+}
 
 if(l==="background") continue;
 
@@ -619,6 +685,18 @@ await draw("traits/"+l+"/"+clean(t.value)+".png");
 else if(window.lastBuilderState){
 
 for(const l of order){
+
+  /* ===== NHL OVERRIDE ===== */
+if(window.currentNHL){
+
+  if(l === "body" || l === "hat") continue;
+
+  if(l === "body"){
+    await draw("traits/nhl/" + window.currentNHL + ".png");
+    continue;
+  }
+
+}
 
 if(l==="background") continue;
 
@@ -654,6 +732,16 @@ async function applyOverlay(){
 const selected = document.getElementById("overlay_select").value;
 
 window.currentOverlay = selected || null;
+
+await redrawWithOverlay();
+
+}
+
+async function applyNHL(){
+
+const selected = document.getElementById("nhl_select").value;
+
+window.currentNHL = selected || null;
 
 await redrawWithOverlay();
 
