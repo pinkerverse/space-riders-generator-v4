@@ -674,6 +674,8 @@ else if(window.lastBuilderState){
 
 for(const l of order){
 
+if(l === "glasses") continue;
+
 // skip original body + hat when NHL is active
 if(window.currentNHL && (l === "body" || l === "hat")) continue;
 
