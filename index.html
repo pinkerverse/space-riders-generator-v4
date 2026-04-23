@@ -686,15 +686,15 @@ else if(window.lastBuilderState){
 
 for(const l of order){
 
-  /* ===== NHL OVERRIDE ===== */
+/* ===== NHL OVERRIDE ===== */
 if(window.currentNHL){
 
-  if(l === "body" || l === "hat") continue;
+if(l === "body" || l === "hat") continue;
 
-  if(l === "body"){
-    await draw("traits/nhl/" + window.currentNHL + ".png");
-    continue;
-  }
+if(l === "body"){
+await draw("traits/nhl/" + window.currentNHL + ".png");
+continue;
+}
 
 }
 
@@ -773,6 +773,18 @@ await draw("traits/background/"+clean(t.value)+".png");
 /* rest */
 for(const l of order){
 
+/* ===== NHL OVERRIDE (ADD THIS) ===== */
+if(window.currentNHL){
+
+  if(l === "body" || l === "hat") continue;
+
+  if(l === "body"){
+    await draw("traits/nhl/" + window.currentNHL + ".png");
+    continue;
+  }
+
+}
+
 if(l==="background") continue;
 
 if(l==="shadow"){
@@ -816,6 +828,18 @@ await draw("traits/background/"+v+".png");
 
 /* rest */
 for(const l of order){
+
+  /* ===== NHL OVERRIDE (ADD THIS) ===== */
+if(window.currentNHL){
+
+  if(l === "body" || l === "hat") continue;
+
+  if(l === "body"){
+    await draw("traits/nhl/" + window.currentNHL + ".png");
+    continue;
+  }
+
+}
 
 if(l==="background") continue;
 
