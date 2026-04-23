@@ -645,20 +645,6 @@ if(window.lastNFTData){
 
 for(const l of order){
 
-  /* ===== NHL OVERRIDE ===== */
-if(window.currentNHL){
-
-  // draw NHL when we reach body
-  if(l === "body"){
-    await draw("traits/nhl/" + window.currentNHL + ".png");
-    continue;
-  }
-
-  // skip original hat
-  if(l === "hat") continue;
-
-}
-
 if(l==="background") continue;
 
 if(l==="shadow"){
@@ -687,20 +673,6 @@ await draw("traits/"+l+"/"+clean(t.value)+".png");
 else if(window.lastBuilderState){
 
 for(const l of order){
-
-/* ===== NHL OVERRIDE ===== */
-if(window.currentNHL){
-
-  // draw NHL when we reach body
-  if(l === "body"){
-    await draw("traits/nhl/" + window.currentNHL + ".png");
-    continue;
-  }
-
-  // skip original hat
-  if(l === "hat") continue;
-
-}
 
 if(l==="background") continue;
 
@@ -777,20 +749,6 @@ await draw("traits/background/"+clean(t.value)+".png");
 /* rest */
 for(const l of order){
 
-/* ===== NHL OVERRIDE (ADD THIS) ===== */
-if(window.currentNHL){
-
-  // draw NHL when we reach body
-  if(l === "body"){
-    await draw("traits/nhl/" + window.currentNHL + ".png");
-    continue;
-  }
-
-  // skip original hat
-  if(l === "hat") continue;
-
-}
-
 if(l==="background") continue;
 
 if(l==="shadow"){
@@ -835,20 +793,6 @@ await draw("traits/background/"+v+".png");
 /* rest */
 for(const l of order){
 
-  /* ===== NHL OVERRIDE (ADD THIS) ===== */
-if(window.currentNHL){
-
-  // draw NHL when we reach body
-  if(l === "body"){
-    await draw("traits/nhl/" + window.currentNHL + ".png");
-    continue;
-  }
-
-  // skip original hat
-  if(l === "hat") continue;
-
-}
-
 if(l==="background") continue;
 
 if(l==="shadow"){
@@ -874,6 +818,11 @@ await draw("traits/"+l+"/"+v+".png");
 /* ===== OVERLAY ===== */
 if(window.currentOverlay){
 await draw("traits/overlays/" + window.currentOverlay + ".png");
+}
+
+/* ===== NHL (TOP LAYER) ===== */
+if(window.currentNHL){
+await draw("traits/nhl/" + window.currentNHL + ".png");
 }
 
 img.src = canvas.toDataURL();
