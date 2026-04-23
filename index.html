@@ -568,9 +568,6 @@ await draw("traits/"+l+"/"+clean(t.value)+".png");
 else if(window.lastBuilderState){
 
 for(const l of order){
-
-// skip original body + hat when NHL is active
-if(window.currentNHL && (l === "body" || l === "hat")) continue;
   
 if(l==="background" && !window.bgVisible) continue;
 
@@ -647,9 +644,6 @@ await draw("traits/special_backgrounds/" + selected + ".png");
 if(window.lastNFTData){
 
 for(const l of order){
-
-// skip original body + hat when NHL is active
-if(window.currentNHL && (l === "body" || l === "hat")) continue;
 
 if(l==="background") continue;
 
