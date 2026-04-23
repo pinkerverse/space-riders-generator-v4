@@ -540,9 +540,6 @@ if(window.lastNFTData){
 
 for(const l of order){
 
-if(window.currentNHL && (l === "body" || l === "hat")) continue;
-if(l === "space_shine") continue;
-
 if(l==="background" && !window.bgVisible) continue;
 
 if(l==="shadow"){
@@ -651,9 +648,6 @@ if(window.lastNFTData){
 
 for(const l of order){
 
-if(window.currentNHL && (l === "body" || l === "hat")) continue;
-if(l === "space_shine") continue;
-
 // skip original body + hat when NHL is active
 if(window.currentNHL && (l === "body" || l === "hat")) continue;
 
@@ -738,14 +732,6 @@ await redrawWithOverlay();
 
 }
 
-else if(window.lastBuilderState){
-
-const v = window.lastBuilderState["space_shine"];
-
-if(v){
-await draw("traits/space_shine/" + v + ".png");
-}
-
 async function redrawWithOverlay(){
 
 ctx.clearRect(0,0,2000,2000);
@@ -771,9 +757,6 @@ await draw("traits/background/"+clean(t.value)+".png");
 
 /* rest */
 for(const l of order){
-
-if(window.currentNHL && (l === "body" || l === "hat")) continue;
-if(l === "space_shine") continue;
 
 // skip original body + hat when NHL is active
 if(window.currentNHL && (l === "body" || l === "hat")) continue;
@@ -852,34 +835,13 @@ if(window.currentOverlay){
 await draw("traits/overlays/" + window.currentOverlay + ".png");
 }
 
-/* ===== NHL ===== */
+/* ===== NHL (TOP LAYER) ===== */
 if(window.currentNHL){
 await draw("traits/nhl/" + window.currentNHL + ".png");
 }
 
-/* ===== SPACE SHINE (TOP LAYER) ===== */
-if(window.lastNFTData){
-
-const t = window.lastNFTData.attributes.find(
-a => a.trait_type.toLowerCase().replace(/ /g,"_") === "space_shine"
-);
-
-if(t){
-await draw("traits/space_shine/" + clean(t.value) + ".png");
-}
-
-}
-else if(window.lastBuilderState){
-
-const v = window.lastBuilderState["space_shine"];
-
-if(v){
-await draw("traits/space_shine/" + v + ".png");
-}
-
-}
-
 img.src = canvas.toDataURL();
+
 }
   
 </script>
