@@ -835,12 +835,33 @@ if(window.currentOverlay){
 await draw("traits/overlays/" + window.currentOverlay + ".png");
 }
 
-/* ===== NHL (TOP LAYER) ===== */
+/* ===== NHL ===== */
 if(window.currentNHL){
 await draw("traits/nhl/" + window.currentNHL + ".png");
 }
 
-img.src = canvas.toDataURL();
+/* ===== SPACE SHINE ON TOP (ONLY IF NHL ACTIVE) ===== */
+if(window.currentNHL){
+
+  // NFT mode
+  if(window.lastNFTData){
+    const t = window.lastNFTData.attributes.find(
+      a => a.trait_type.toLowerCase().replace(/ /g,"_") === "space_shine"
+    );
+
+    if(t){
+      await draw("traits/space_shine/" + clean(t.value) + ".png");
+    }
+  }
+
+  // Builder mode
+  else if(window.lastBuilderState){
+    const v = window.lastBuilderState["space_shine"];
+
+    if(v){
+      await draw("traits/space_shine/" + v + ".png");
+    }
+  }
 
 }
   
