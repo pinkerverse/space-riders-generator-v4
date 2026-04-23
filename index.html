@@ -632,26 +632,13 @@ nhlSelect.appendChild(option);
 async function applySpecialBackground(){
 
 const selected = document.getElementById("special_bg_select").value;
+window.currentSpecialBG = selected;
+if(!selected) return;
 
-// store selection globally
-window.currentSpecialBG = selected || null;
+ctx.clearRect(0,0,2000,2000);
 
-// if nothing selected → just redraw normally
-if(!selected){
-  await redrawWithOverlay();
-  return;
-}
-
-// show loading (optional but nice)
-load.style.display = "flex";
-
-// 🚀 DO NOT manually build full image
-// just call the main renderer
-await redrawWithOverlay();
-
-load.style.display = "none";
-
-}
+/* draw selected background */
+await draw("traits/special_backgrounds/" + selected + ".png");
 
 /* ===== NFT MODE ===== */
 if(window.lastNFTData){
@@ -686,8 +673,6 @@ await draw("traits/"+l+"/"+clean(t.value)+".png");
 else if(window.lastBuilderState){
 
 for(const l of order){
-
-if(l === "glasses") continue;
 
 // skip original body + hat when NHL is active
 if(window.currentNHL && (l === "body" || l === "hat")) continue;
@@ -767,8 +752,6 @@ await draw("traits/background/"+clean(t.value)+".png");
 /* rest */
 for(const l of order){
 
-if(l === "glasses") continue;
-
 // skip original body + hat when NHL is active
 if(window.currentNHL && (l === "body" || l === "hat")) continue;
 
@@ -816,8 +799,6 @@ await draw("traits/background/"+v+".png");
 /* rest */
 for(const l of order){
 
-if(l === "glasses") continue;
-
 // skip original body + hat when NHL is active
 if(window.currentNHL && (l === "body" || l === "hat")) continue;
   
@@ -853,28 +834,6 @@ if(window.currentNHL){
 await draw("traits/nhl/" + window.currentNHL + ".png");
 }
 
-  /* ===== GLASSES (TOP LAYER) ===== */
-
-// NFT mode
-if(window.lastNFTData){
-  const t = window.lastNFTData.attributes.find(
-    a => a.trait_type.toLowerCase().replace(/ /g,"_") === "glasses"
-  );
-
-  if(t){
-    await draw("traits/glasses/" + clean(t.value) + ".png");
-  }
-}
-
-// Builder mode
-else if(window.lastBuilderState){
-  const v = window.lastBuilderState["glasses"];
-
-  if(v){
-    await draw("traits/glasses/" + v + ".png");
-  }
-}
-  
 /* ===== SPACE SHINE ON TOP (ONLY IF NHL ACTIVE) ===== */
 if(window.currentNHL){
 
