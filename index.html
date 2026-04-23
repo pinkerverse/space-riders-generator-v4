@@ -648,12 +648,16 @@ for(const l of order){
   /* ===== NHL OVERRIDE ===== */
 if(window.currentNHL){
 
-  if(l === "body" || l === "hat") continue;
-
+  // draw NHL when we reach body
   if(l === "body"){
     await draw("traits/nhl/" + window.currentNHL + ".png");
     continue;
   }
+
+  // skip original hat
+  if(l === "hat") continue;
+
+}
 
 }
 
@@ -689,11 +693,15 @@ for(const l of order){
 /* ===== NHL OVERRIDE ===== */
 if(window.currentNHL){
 
-if(l === "body" || l === "hat") continue;
+  // draw NHL when we reach body
+  if(l === "body"){
+    await draw("traits/nhl/" + window.currentNHL + ".png");
+    continue;
+  }
 
-if(l === "body"){
-await draw("traits/nhl/" + window.currentNHL + ".png");
-continue;
+  // skip original hat
+  if(l === "hat") continue;
+
 }
 
 }
@@ -776,12 +784,16 @@ for(const l of order){
 /* ===== NHL OVERRIDE (ADD THIS) ===== */
 if(window.currentNHL){
 
-  if(l === "body" || l === "hat") continue;
-
+  // draw NHL when we reach body
   if(l === "body"){
     await draw("traits/nhl/" + window.currentNHL + ".png");
     continue;
   }
+
+  // skip original hat
+  if(l === "hat") continue;
+
+}
 
 }
 
@@ -832,12 +844,16 @@ for(const l of order){
   /* ===== NHL OVERRIDE (ADD THIS) ===== */
 if(window.currentNHL){
 
-  if(l === "body" || l === "hat") continue;
-
+  // draw NHL when we reach body
   if(l === "body"){
     await draw("traits/nhl/" + window.currentNHL + ".png");
     continue;
   }
+
+  // skip original hat
+  if(l === "hat") continue;
+
+}
 
 }
 
