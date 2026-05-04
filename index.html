@@ -365,7 +365,7 @@ const SPECIAL_BACKGROUNDS = [
 "grey","starry_night","beach_2","rainbow","pink_void",
 "rider_special_blue","blue_void","ikuzo","rider_special_dark","green_void","cab_special",
 "surf","chrome","grail","blurr","vanilla_sky","dark_ride","starry","diamond","gold","rink","spaceport",
-"japan","moon","cyberpunk","star_wars_tatooine","star_wars_death_star",
+"japan","moon","cyberpunk","star_wars_tatooine","star_wars_death_star"
 ];
 
 const OVERLAYS = [
@@ -449,29 +449,10 @@ return str.toLowerCase().replace(/ /g,"_").replace(/[^a-z0-9_]/g,"");
 
 function draw(src){
 return new Promise(r=>{
-
-  let i=new Image();
-
-  let done = false;
-
-  const finish = ()=>{
-    if(done) return;
-    done = true;
-    r();
-  };
-
-  i.onload = ()=>{
-    ctx.drawImage(i,0,0,2000,2000);
-    finish();
-  };
-
-  i.onerror = finish;
-
-  // 🚀 SAFETY TIMEOUT (CRITICAL)
-  setTimeout(finish, 1500);
-
-  i.src = src;
-
+let i=new Image();
+i.src=src;
+i.onload=()=>{ctx.drawImage(i,0,0,2000,2000);r();}
+i.onerror=()=>r();
 });
 }
 
@@ -662,15 +643,6 @@ nhlSelect.appendChild(option);
 });
 
 async function applySpecialBackground(){
-
-const selected = document.getElementById("special_bg_select").value;
-
-window.currentSpecialBG = selected || null;
-
-// 🚀 ONLY THIS
-await redrawWithOverlay();
-
-}
 
 const selected = document.getElementById("special_bg_select").value;
 window.currentSpecialBG = selected;
