@@ -645,6 +645,15 @@ nhlSelect.appendChild(option);
 async function applySpecialBackground(){
 
 const selected = document.getElementById("special_bg_select").value;
+
+window.currentSpecialBG = selected || null;
+
+// 🚀 ONLY THIS
+await redrawWithOverlay();
+
+}
+
+const selected = document.getElementById("special_bg_select").value;
 window.currentSpecialBG = selected;
 if(!selected) return;
 
