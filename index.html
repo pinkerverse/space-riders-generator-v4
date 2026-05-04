@@ -449,10 +449,29 @@ return str.toLowerCase().replace(/ /g,"_").replace(/[^a-z0-9_]/g,"");
 
 function draw(src){
 return new Promise(r=>{
-let i=new Image();
-i.src=src;
-i.onload=()=>{ctx.drawImage(i,0,0,2000,2000);r();}
-i.onerror=()=>r();
+
+  let i=new Image();
+
+  let done = false;
+
+  const finish = ()=>{
+    if(done) return;
+    done = true;
+    r();
+  };
+
+  i.onload = ()=>{
+    ctx.drawImage(i,0,0,2000,2000);
+    finish();
+  };
+
+  i.onerror = finish;
+
+  // 🚀 SAFETY TIMEOUT (CRITICAL)
+  setTimeout(finish, 1500);
+
+  i.src = src;
+
 });
 }
 
