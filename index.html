@@ -460,18 +460,36 @@ i.onerror=()=>r();
 
 async function generate(){
 
-genBtn.disabled=true;
-load.style.display="flex";
+genBtn.disabled = true;
+load.style.display = "flex";
 
-const id=document.getElementById("nftInput").value;
-const res=await fetch(BASE+id+".json");
-const data=await res.json();
+try {
 
-window.lastNFTData = data;
-window.lastBuilderState = null;
-window.bgVisible = true;
+  const id = document.getElementById("nftInput").value;
 
-await redrawWithOverlay();
+  if(!id){
+    alert("Please enter an NFT ID");
+    throw new Error("No ID");
+  }
+
+  const res = await fetch(BASE + id + ".json");
+
+  if(!res.ok){
+    throw new Error("Fetch failed");
+  }
+
+  const data = await res.json();
+
+  window.lastNFTData = data;
+  window.lastBuilderState = null;
+  window.bgVisible = true;
+
+  await redrawWithOverlay();
+
+} catch(e){
+  console.error(e);
+  alert("Failed to load NFT. Try another ID.");
+}
 
 finish();
 }
