@@ -463,8 +463,21 @@ async function generate(){
 genBtn.disabled=true;
 load.style.display="flex";
 
+try{
+
 const id=document.getElementById("nftInput").value;
+
+if(!id){
+  alert("Enter an ID");
+  throw new Error("No ID");
+}
+
 const res=await fetch(BASE+id+".json");
+
+if(!res.ok){
+  throw new Error("Fetch failed");
+}
+
 const data=await res.json();
 
 window.lastNFTData = data;
@@ -472,6 +485,11 @@ window.lastBuilderState = null;
 window.bgVisible = true;
 
 await redrawWithOverlay();
+
+}catch(e){
+console.error(e);
+alert("Failed to load NFT");
+}
 
 finish();
 }
