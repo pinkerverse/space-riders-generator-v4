@@ -359,9 +359,9 @@ space_shine:["black","white"]
 }; // ✅ correctly close TRAITS
   
 const SPECIAL_BACKGROUNDS = [
-"tatooine","death_star","space_ship_2","metallic_rider",
+"trippy_1","space_ship_2","metallic_rider","trippy_2","trippy_3",
 "riders_gonna_ride","planet_1","planet_2","dark_space","beach",
-"jungle","squid_game","sky","void","solarflare","spaceship_1",
+"jungle","squid_game","sky","void","solarflare","spaceship_11",
 "grey","starry_night","beach_2","rainbow","pink_void",
 "rider_special_blue","blue_void","ikuzo","rider_special_dark","green_void","cab_special",
 "surf","chrome","grail","blurr","vanilla_sky","dark_ride","starry","diamond","gold","rink","spaceport",
@@ -463,21 +463,8 @@ async function generate(){
 genBtn.disabled=true;
 load.style.display="flex";
 
-try{
-
 const id=document.getElementById("nftInput").value;
-
-if(!id){
-  alert("Enter an ID");
-  throw new Error("No ID");
-}
-
 const res=await fetch(BASE+id+".json");
-
-if(!res.ok){
-  throw new Error("Fetch failed");
-}
-
 const data=await res.json();
 
 window.lastNFTData = data;
@@ -485,11 +472,6 @@ window.lastBuilderState = null;
 window.bgVisible = true;
 
 await redrawWithOverlay();
-
-}catch(e){
-console.error(e);
-alert("Failed to load NFT");
-}
 
 finish();
 }
@@ -663,12 +645,85 @@ nhlSelect.appendChild(option);
 async function applySpecialBackground(){
 
 const selected = document.getElementById("special_bg_select").value;
+window.currentSpecialBG = selected;
+if(!selected) return;
 
-// store only
-window.currentSpecialBG = selected || null;
+ctx.clearRect(0,0,2000,2000);
 
-// 🚀 ALWAYS use main renderer
-await redrawWithOverlay();
+/* draw selected background */
+await draw("traits/special_backgrounds/" + selected + ".png");
+
+/* ===== NFT MODE ===== */
+if(window.lastNFTData){
+
+for(const l of order){
+
+// 🚀 ADD THIS LINE
+if(l === "glasses") continue;
+
+// skip original body + hat when NHL is active
+if(window.currentNHL && (l === "body" || l === "hat")) continue;
+
+if(l==="background") continue;
+
+if(l==="shadow"){
+await draw("traits/shadow/default.png");
+continue;
+}
+
+if(l==="cheeks"){
+await draw("traits/cheeks/default.png");
+continue;
+}
+
+const t = window.lastNFTData.attributes.find(
+a => a.trait_type.toLowerCase().replace(/ /g,"_") === l
+);
+
+if(t){
+await draw("traits/"+l+"/"+clean(t.value)+".png");
+}
+
+}
+
+}
+
+/* ===== BUILDER MODE ===== */
+else if(window.lastBuilderState){
+
+for(const l of order){
+
+if(l === "glasses") continue;
+
+// skip original body + hat when NHL is active
+if(window.currentNHL && (l === "body" || l === "hat")) continue;
+
+if(l==="background") continue;
+
+if(l==="shadow"){
+await draw("traits/shadow/default.png");
+continue;
+}
+
+if(l==="cheeks"){
+await draw("traits/cheeks/default.png");
+continue;
+}
+
+const v = window.lastBuilderState[l];
+
+if(v){
+await draw("traits/"+l+"/"+v+".png");
+}
+
+}
+
+}
+
+if(window.currentOverlay){
+await draw("traits/overlays/" + window.currentOverlay + ".png");
+}
+img.src = canvas.toDataURL();
 
 }
 
